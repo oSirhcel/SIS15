@@ -1,7 +1,7 @@
 import '../styles/globals.css';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Theme, ThemeProvider } from '@react-navigation/native';
+import { type Theme, ThemeProvider } from '@react-navigation/native';
 import { SplashScreen, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as React from 'react';
@@ -24,21 +24,21 @@ export {
 } from 'expo-router';
 
 // Prevent the splash screen from auto-hiding before getting the color scheme.
-SplashScreen.preventAutoHideAsync();
+void SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const { colorScheme, setColorScheme, isDarkColorScheme } = useColorScheme();
   const [isColorSchemeLoaded, setIsColorSchemeLoaded] = React.useState(false);
 
   React.useEffect(() => {
-    (async () => {
+    void (async () => {
       const theme = await AsyncStorage.getItem('theme');
       if (Platform.OS === 'web') {
         // Adds the background color to the html element to prevent white background on overscroll.
         document.documentElement.classList.add('bg-background');
       }
       if (!theme) {
-        AsyncStorage.setItem('theme', colorScheme);
+        void AsyncStorage.setItem('theme', colorScheme);
         setIsColorSchemeLoaded(true);
         return;
       }
@@ -51,7 +51,7 @@ export default function RootLayout() {
       }
       setIsColorSchemeLoaded(true);
     })().finally(() => {
-      SplashScreen.hideAsync();
+      void SplashScreen.hideAsync();
     });
   }, []);
 
