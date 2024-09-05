@@ -10,7 +10,7 @@ import {
   getAssetsAsync,
 } from 'expo-media-library';
 
-export default function Index() {
+export default function Tab() {
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [facing, setFacing] = useState<CameraType>('back');
   const [mediaPermission, requestMediaPermission] = useMediaPermissions();
