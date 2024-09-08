@@ -9,6 +9,7 @@ import {
   saveToLibraryAsync,
   getAssetsAsync,
 } from 'expo-media-library';
+import * as ImagePicker from 'expo-image-picker'; // Import ImagePicker
 import { useSharedValue } from 'react-native-reanimated';
 import {
   BottomSheetModal,
@@ -17,7 +18,12 @@ import {
   BottomSheetHandle,
 } from '@/components/ui/bottom-sheet';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Info, RecycleIcon } from 'lucide-react-native';
+import {
+  Info,
+  RecycleIcon,
+  Image as ImageIcon,
+  Camera as CameraIcon,
+} from 'lucide-react-native';
 
 export default function Tab() {
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
@@ -122,6 +128,30 @@ export default function Tab() {
     setFacing((facing) => (facing === 'back' ? 'front' : 'back'));
   };
 
+  const openLastPhoto = () => {
+    if (lastPhoto) {
+      handlePresentModalPress();
+    }
+  };
+
+  const pickImageFromLibrary = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: false,
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+      setLastPhoto(result.assets[0].uri);
+      handlePresentModalPress();
+    }
+  };
+
+  const closeBottomSheet = () => {
+    bottomSheetModalRef.current?.dismiss();
+    setIsOpen(false);
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <BottomSheetModal
@@ -139,7 +169,14 @@ export default function Tab() {
         backgroundStyle={{ backgroundColor: '#f3f4f6' }}
       >
         <BottomSheetView className='flex-1 px-4 pb-6 pt-2'>
-          <View className='mb-4 flex-row items-center justify-between'>
+          {lastPhoto && (
+            <Image
+              source={{ uri: lastPhoto }}
+              style={{ width: '100%', height: 300 }}
+              contentFit='contain'
+            />
+          )}
+          <View className='mt-4 mb-4 flex-row items-center justify-between'>
             <Text className='text-2xl font-bold text-gray-800'>
               {scannedItem.name}
             </Text>
@@ -172,6 +209,27 @@ export default function Tab() {
               </View>
             ))}
           </View>
+
+          <View className='mt-6 flex-row justify-between'>
+            <TouchableOpacity
+              onPress={pickImageFromLibrary}
+              className='mb-6 flex-row items-center rounded-lg bg-blue-500 p-4'
+            >
+              <ImageIcon size={20} color='white' />
+              <Text className='ml-2 font-semibold text-white'>
+                Select from Album
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={closeBottomSheet}
+              className='mb-6 flex-row items-center rounded-lg bg-red-500 p-4'
+            >
+              <CameraIcon size={20} color='white' />
+              <Text className='ml-2 font-semibold text-white'>
+                Return to Camera
+              </Text>
+            </TouchableOpacity>
+          </View>
         </BottomSheetView>
       </BottomSheetModal>
       <CameraView
@@ -184,7 +242,10 @@ export default function Tab() {
         <View className='absolute bottom-0 left-0 right-0 h-24 bg-black'>
           <View className='flex-1 flex-row items-center justify-between px-4'>
             {lastPhoto && (
-              <TouchableOpacity className='h-16 w-12 overflow-hidden rounded-md border-2 border-white'>
+              <TouchableOpacity
+                onPress={openLastPhoto}
+                className='h-16 w-12 overflow-hidden rounded-md border-2 border-white'
+              >
                 <Image
                   source={{ uri: lastPhoto }}
                   style={{
