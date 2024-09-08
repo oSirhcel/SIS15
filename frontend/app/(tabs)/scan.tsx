@@ -9,7 +9,7 @@ import {
   saveToLibraryAsync,
   getAssetsAsync,
 } from 'expo-media-library';
-import * as ImagePicker from 'expo-image-picker'; // Import ImagePicker
+import * as ImagePicker from 'expo-image-picker';
 import { useSharedValue } from 'react-native-reanimated';
 import {
   BottomSheetModal,
@@ -24,6 +24,8 @@ import {
   Image as ImageIcon,
   Camera as CameraIcon,
 } from 'lucide-react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { scannedItemsEmitter, ScannedItemType } from './types';
 
 export default function Tab() {
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
@@ -36,13 +38,11 @@ export default function Tab() {
 
   const animatedIndex = useSharedValue<number>(0);
   const animatedPosition = useSharedValue<number>(0);
-  // ref
+
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
-  // variables
   const snapPoints = useMemo(() => ['50%', '75%', '90%'], []);
 
-  // callbacks
   const handlePresentModalPress = useCallback(() => {
     if (isOpen) {
       bottomSheetModalRef.current?.dismiss();
@@ -107,6 +107,10 @@ export default function Tab() {
     );
   }
 
+  const generateRandomID = () => {
+    return 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'.replace(/x/g, () => Math.random().toString(16).substr(2, 1));
+  }
+
   const takePicture = async () => {
     if (cameraRef.current) {
       const photo = await cameraRef.current.takePictureAsync();
@@ -121,7 +125,32 @@ export default function Tab() {
       handlePresentModalPress();
       await saveToLibraryAsync(photo.uri);
       setLastPhoto(photo.uri);
+
+      // Save scanned item data to AsyncStorage
+      try {
+        const newScannedItem: ScannedItemType = {
+          id: generateRandomID(),
+          title: scannedItem.name, // Replace with actual item name from API
+          description: scannedItem.description, // Replace with actual description from API
+          date: new Date().toLocaleDateString(),
+          type: 'recyclable', // Replace with actual type from API
+          imageUri: photo.uri,
+        };
+
+        const storedItems = await AsyncStorage.getItem('scannedItems');
+        const itemsArray = storedItems ? JSON.parse(storedItems) : [];
+        itemsArray.push(newScannedItem);
+        await AsyncStorage.setItem('scannedItems', JSON.stringify(itemsArray));
+
+        // Trigger a change event to notify listeners
+        AsyncStorage.mergeItem('scannedItems', JSON.stringify(itemsArray)); 
+      } catch (error) {
+        console.error('Error saving scanned item:', error);
+      }
     }
+    
+    // Emit an event after saving the new item
+    scannedItemsEmitter.emit('newItemScanned');  
   };
 
   const changeFacing = () => {
@@ -138,6 +167,28 @@ export default function Tab() {
     if (!result.canceled && result.assets.length > 0) {
       setLastPhoto(result.assets[0].uri);
       handlePresentModalPress();
+
+      // Save scanned item data to AsyncStorage
+      try {
+        const newScannedItem: ScannedItemType = {
+          id: generateRandomID(),
+          title: scannedItem.name, // Replace with actual item name from API
+          description: scannedItem.description, // Replace with actual description from API
+          date: new Date().toLocaleDateString(),
+          type: 'recyclable', // Replace with actual type from API
+          imageUri: result.assets[0].uri,
+        };
+
+        const storedItems = await AsyncStorage.getItem('scannedItems');
+        const itemsArray = storedItems ? JSON.parse(storedItems) : [];
+        itemsArray.push(newScannedItem);
+        await AsyncStorage.setItem('scannedItems', JSON.stringify(itemsArray));
+
+        // Trigger a change event to notify listeners
+        AsyncStorage.mergeItem('scannedItems', JSON.stringify(itemsArray));
+      } catch (error) {
+        console.error('Error saving scanned item:', error);
+      }
     }
   };
 
@@ -235,7 +286,7 @@ export default function Tab() {
       >
         <View className='absolute bottom-0 left-0 right-0 h-24 bg-black'>
           <View className='flex-1 flex-row items-center justify-between px-4'>
-          {lastPhoto && (
+            {lastPhoto && (
               <TouchableOpacity
                 onPress={pickImageFromLibrary}
                 className='h-16 w-12 overflow-hidden rounded-md border-2 border-white'
