@@ -128,12 +128,6 @@ export default function Tab() {
     setFacing((facing) => (facing === 'back' ? 'front' : 'back'));
   };
 
-  const openLastPhoto = () => {
-    if (lastPhoto) {
-      handlePresentModalPress();
-    }
-  };
-
   const pickImageFromLibrary = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -241,9 +235,9 @@ export default function Tab() {
       >
         <View className='absolute bottom-0 left-0 right-0 h-24 bg-black'>
           <View className='flex-1 flex-row items-center justify-between px-4'>
-            {lastPhoto && (
+          {lastPhoto && (
               <TouchableOpacity
-                onPress={openLastPhoto}
+                onPress={pickImageFromLibrary}
                 className='h-16 w-12 overflow-hidden rounded-md border-2 border-white'
               >
                 <Image
