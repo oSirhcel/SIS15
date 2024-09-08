@@ -98,14 +98,9 @@ export default function HistoryTab() {
 
   // callbacks
   const handlePresentModalPress = useCallback(() => {
-    if (isOpen) {
-      bottomSheetModalRef.current?.dismiss();
-      setIsOpen(false);
-    } else {
-      bottomSheetModalRef.current?.present();
-      setIsOpen(true);
-    }
-  }, [isOpen]);
+    bottomSheetModalRef.current?.present();
+    setIsOpen(true);
+  }, []);
 
   const handleSheetChanges = useCallback((index: number) => {
     console.log('handleSheetChanges', index);
@@ -145,7 +140,7 @@ export default function HistoryTab() {
 
   const handleItemPress = (item: ScannedItemType) => {
     setSelectedItem(item);
-    handlePresentModalPress();
+    handlePresentModalPress(); 
   };
 
   const closeBottomSheet = () => {
