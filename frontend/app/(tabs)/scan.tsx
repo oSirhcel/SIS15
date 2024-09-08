@@ -44,14 +44,9 @@ export default function Tab() {
   const snapPoints = useMemo(() => ['50%', '75%', '90%'], []);
 
   const handlePresentModalPress = useCallback(() => {
-    if (isOpen) {
-      bottomSheetModalRef.current?.dismiss();
-      setIsOpen(false);
-    } else {
-      bottomSheetModalRef.current?.present();
-      setIsOpen(true);
-    }
-  }, [isOpen]);
+    bottomSheetModalRef.current?.present();
+    setIsOpen(true);
+  }, []);
 
   const handleSheetChanges = useCallback((index: number) => {
     console.log('handleSheetChanges', index);
@@ -286,11 +281,12 @@ export default function Tab() {
       >
         <View className='absolute bottom-0 left-0 right-0 h-24 bg-black'>
           <View className='flex-1 flex-row items-center justify-between px-4'>
-            {lastPhoto && (
-              <TouchableOpacity
-                onPress={pickImageFromLibrary}
-                className='h-16 w-12 overflow-hidden rounded-md border-2 border-white'
-              >
+            <TouchableOpacity // Always render the TouchableOpacity
+              onPress={pickImageFromLibrary}
+              className='h-16 w-12 overflow-hidden rounded-md border-2 border-white'
+            >
+              {/* Conditionally render the image if lastPhoto exists */}
+              {lastPhoto && (
                 <Image
                   source={{ uri: lastPhoto }}
                   style={{
@@ -299,8 +295,8 @@ export default function Tab() {
                   }}
                   contentFit='cover'
                 />
-              </TouchableOpacity>
-            )}
+              )}
+            </TouchableOpacity>
             <TouchableOpacity
               onPress={takePicture}
               className='h-16 w-16 items-center justify-center rounded-full bg-white'
