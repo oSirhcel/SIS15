@@ -4,7 +4,7 @@ import torch
 from PIL import Image
 
 img_pah = 'WechatIMG2.jpg'
-classes = ['battery', 'cardboard', 'glass', 'metal', 'paper', 'plastic', 'trash']
+classes = ['battery', 'cardboard', 'glass', 'metal', 'paper', 'plastic', 'trash', 'organic']
 
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
