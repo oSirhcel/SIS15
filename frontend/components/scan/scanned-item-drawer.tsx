@@ -1,5 +1,5 @@
 import { BottomSheetView } from '@/components/ui/bottom-sheet';
-import { View, Text } from 'react-native';
+import { View, Text, Image } from 'react-native';
 import { cn, getIconAndColor } from '@/lib/utils';
 import { InfoIcon } from '@/lib/icons';
 import type { ScannedItemType } from '@/types/scan';
@@ -14,6 +14,16 @@ export const ScannedItemDrawer = ({ item }: Props) => {
       <View className='mb-4 flex-row items-center justify-between'>
         <Text className='text-2xl font-bold text-gray-800'>{item.name}</Text>
       </View>
+
+      {item.image && (
+        <View className='h-30 mb-4 flex w-full items-center rounded-lg bg-gray-200'>
+          <Image
+            source={{ uri: item.image }}
+            className='h-[280px] w-[210px]'
+            resizeMode='cover'
+          />
+        </View>
+      )}
 
       {(() => {
         const { icon: Icon, bgColor } = getIconAndColor(item.type);

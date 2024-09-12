@@ -7,7 +7,6 @@ import { Repeat2Icon } from '@/lib/icons';
 import { DRAWER_SNAP_POINTS } from '@/lib/constants';
 import {
   usePermissions as useMediaPermissions,
-  saveToLibraryAsync,
   getAssetsAsync,
 } from 'expo-media-library';
 import { useSharedValue } from 'react-native-reanimated';
@@ -31,19 +30,12 @@ export default function Tab() {
 
   const animatedIndex = useSharedValue<number>(0);
   const animatedPosition = useSharedValue<number>(0);
-  // ref
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
-  // variables
   const snapPoints = useMemo(() => DRAWER_SNAP_POINTS, []);
 
-  // callbacks
   const handleOpenModal = useCallback(() => {
     bottomSheetModalRef.current?.present();
-  }, []);
-
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log('handleSheetChanges', index);
   }, []);
 
   React.useEffect(() => {
@@ -94,9 +86,12 @@ export default function Tab() {
       }
 
       handleOpenModal();
+      //TODO: Error handling
       const res = await useGetScannedItemData();
-      setScannedItem(res);
-      setLastPhoto(photo.uri);
+      setScannedItem({
+        ...res,
+        image: photo.uri,
+      });
     }
   };
 
@@ -110,7 +105,7 @@ export default function Tab() {
         ref={bottomSheetModalRef}
         index={1}
         snapPoints={snapPoints}
-        onChange={handleSheetChanges}
+        onClose={() => setScannedItem(null)}
         handleComponent={() => (
           <BottomSheetHandle
             className='mt-2 bg-green-300'
@@ -120,14 +115,12 @@ export default function Tab() {
         )}
         backgroundStyle={{ backgroundColor: '#f3f4f6' }}
       >
-        {
-          //TODO: Add loading state
-        }
         {scannedItem && <ScannedItemDrawer item={scannedItem} />}
       </BottomSheetModal>
       <CameraView
         ref={cameraRef}
         facing={facing}
+        ratio='4:3'
         style={{
           flex: 1,
         }}
