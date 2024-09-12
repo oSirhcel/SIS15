@@ -1,6 +1,5 @@
 import { Tabs } from 'expo-router';
-import { HomeIcon } from '@/lib/icons/HomeIcon';
-import { CameraIcon } from '@/lib/icons/CameraIcon';
+import { CameraIcon, HomeIcon } from '@/lib/icons';
 
 export default function TabLayout() {
   return (
