@@ -1,9 +1,9 @@
 //MOCK API
 //TODO: Implement API call to get scanned item
 
-import type { ScannedItem } from '@/types/scan';
+import type { ScannedItemType } from '@/types/scan';
 
-export function useGetScannedItemData(): Promise<ScannedItem> {
+export function useGetScannedItemData(): Promise<ScannedItemType> {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({

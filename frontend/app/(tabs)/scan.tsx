@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { type CameraType, CameraView, useCameraPermissions } from 'expo-camera';
 import { Image } from 'expo-image';
-import { InfoIcon, RecycleIcon, Repeat2Icon } from '@/lib/icons';
+import { Repeat2Icon } from '@/lib/icons';
 import { DRAWER_SNAP_POINTS } from '@/lib/constants';
 import {
   usePermissions as useMediaPermissions,
@@ -13,13 +13,13 @@ import {
 import { useSharedValue } from 'react-native-reanimated';
 import {
   BottomSheetModal,
-  BottomSheetView,
   BottomSheetHandle,
 } from '@/components/ui/bottom-sheet';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import type { ScannedItem } from '@/types/scan';
-import { cn, getIconAndColor } from '@/lib/utils';
+
 import { useGetScannedItemData } from '@/api/useGetScannedItemData';
+import { ScannedItemDrawer } from '@/components/scan/scanned-item-drawer';
+import type { ScannedItemType } from '@/types/scan';
 
 export default function Tab() {
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
@@ -27,7 +27,7 @@ export default function Tab() {
   const [mediaPermission, requestMediaPermission] = useMediaPermissions();
   const cameraRef = useRef<CameraView>(null);
   const [lastPhoto, setLastPhoto] = useState<string | null>(null);
-  const [scannedItem, setScannedItem] = useState<ScannedItem | null>(null);
+  const [scannedItem, setScannedItem] = useState<ScannedItemType | null>(null);
 
   const animatedIndex = useSharedValue<number>(0);
   const animatedPosition = useSharedValue<number>(0);
@@ -120,53 +120,10 @@ export default function Tab() {
         )}
         backgroundStyle={{ backgroundColor: '#f3f4f6' }}
       >
-        {scannedItem && (
-          <BottomSheetView className='flex-1 px-4 pb-6 pt-2'>
-            <View className='mb-4 flex-row items-center justify-between'>
-              <Text className='text-2xl font-bold text-gray-800'>
-                {scannedItem.name}
-              </Text>
-            </View>
-
-            {(() => {
-              const { icon: Icon, bgColor } = getIconAndColor(scannedItem.type);
-              return (
-                <View
-                  className={cn(
-                    'mb-6 flex-row items-center rounded-lg p-4',
-                    bgColor,
-                  )}
-                >
-                  <Icon size={24} color='white' />
-                  <Text className='ml-2 font-semibold text-white'>
-                    Place in {scannedItem.type} Bin
-                  </Text>
-                </View>
-              );
-            })()}
-
-            <View className='mb-6 rounded-lg bg-white p-4 shadow-sm'>
-              <Text className='text-base leading-relaxed text-gray-600'>
-                {scannedItem.description}
-              </Text>
-            </View>
-
-            <View className='rounded-lg bg-white p-4 shadow-sm'>
-              <View className='mb-3 flex-row items-center'>
-                <InfoIcon size={20} color='#4b5563' />
-                <Text className='ml-2 text-lg font-semibold text-gray-800'>
-                  Recycling Tips
-                </Text>
-              </View>
-              {scannedItem.tips.map((tip, index) => (
-                <View key={index} className='mb-2 flex-row items-center'>
-                  <View className='mr-2 h-2 w-2 rounded-full bg-green-500' />
-                  <Text className='text-gray-600'>{tip}</Text>
-                </View>
-              ))}
-            </View>
-          </BottomSheetView>
-        )}
+        {
+          //TODO: Add loading state
+        }
+        {scannedItem && <ScannedItemDrawer item={scannedItem} />}
       </BottomSheetModal>
       <CameraView
         ref={cameraRef}
