@@ -2,77 +2,61 @@ import React from 'react';
 import { View, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text } from '@/components/ui/text';
-import { Trash2, Recycle, Leaf } from 'lucide-react-native';
-import { CameraIcon } from '@/lib/icons/CameraIcon';
-import { cn } from '@/lib/utils';
+import { CameraIcon, Trash2Icon, LeafIcon, RecycleIcon } from '@/lib/icons';
+import { cn, getIconAndColor } from '@/lib/utils';
 import { router } from 'expo-router';
-
-type ScannedItemType = {
-  id: number;
-  title: string;
-  description: string;
-  date: string;
-  type: 'recyclable' | 'biodegradable' | 'trash';
-};
+import type { ScannedItem, WasteType } from '@/types/scan';
 
 // Mock data for scanned items
-const scannedItems: ScannedItemType[] = [
-  // {
-  //   id: 1,
-  //   title: 'Plastic Bottle',
-  //   description: 'Empty water bottle',
-  //   date: '2023-06-01',
-  //   type: 'recyclable',
-  // },
-  // {
-  //   id: 2,
-  //   title: 'Banana Peel',
-  //   description: 'Organic waste',
-  //   date: '2023-06-02',
-  //   type: 'biodegradable',
-  // },
-  // {
-  //   id: 3,
-  //   title: 'Styrofoam Cup',
-  //   description: 'Used coffee cup',
-  //   date: '2023-06-03',
-  //   type: 'trash',
-  // },
-  // {
-  //   id: 4,
-  //   title: 'Cardboard Box',
-  //   description: 'Amazon package',
-  //   date: '2023-06-04',
-  //   type: 'recyclable',
-  // },
-  // {
-  //   id: 5,
-  //   title: 'Apple Core',
-  //   description: 'Fruit waste',
-  //   date: '2023-06-05',
-  //   type: 'biodegradable',
-  // },
+const scannedItems: ScannedItem[] = [
+  {
+    id: '1',
+    name: 'Plastic Bottle',
+    description: 'Empty water bottle',
+    date: new Date(),
+    type: 'Recycling',
+    tips: [
+      'Remove the cap and recycle separately',
+      'Crush the bottle to save space',
+      'Check for recycling symbol (#1 PET or #2 HDPE)',
+    ],
+  },
+  {
+    id: '2',
+    name: 'Banana Peel',
+    description: 'Organic waste',
+    date: new Date(),
+    type: 'Organic Waste',
+    tips: ['Compost the peel', 'Do not put in recycling or garbage bin'],
+  },
+  {
+    id: '3',
+    name: 'Plastic Bag',
+    description: 'Empty shopping bag',
+    date: new Date(),
+    type: 'General Waste',
+    tips: ['Reuse the bag', 'Dispose of in general waste bin'],
+  },
+  {
+    id: '4',
+    name: 'Aluminum Can',
+    description: 'Empty soda can',
+    date: new Date(),
+    type: 'Recycling',
+    tips: ['Rinse the can', 'Check for recycling symbol (#1 PET or #2 HDPE)'],
+  },
+  {
+    id: '5',
+    name: 'Paper Towel',
+    description: 'Used paper towel',
+    date: new Date(),
+    type: 'Organic Waste',
+    tips: ['Compost the paper towel', 'Do not put in recycling or garbage bin'],
+  },
 ];
 
-const getIconAndColor = (type: 'recyclable' | 'biodegradable' | 'trash') => {
-  switch (type) {
-    case 'recyclable':
-      return {
-        icon: Recycle,
-        color: 'text-green-500',
-        bgColor: 'bg-green-500',
-      };
-    case 'biodegradable':
-      return { icon: Leaf, color: 'text-yellow-500', bgColor: 'bg-yellow-500' };
-    case 'trash':
-      return { icon: Trash2, color: 'text-red-500', bgColor: 'bg-red-500' };
-    default:
-      return { icon: Trash2, color: 'text-gray-500', bgColor: 'bg-gray-500' };
-  }
-};
-
-const ScannedItem = ({ item }: { item: ScannedItemType }) => {
-  const { icon: Icon, color, bgColor } = getIconAndColor(item.type);
+const ScannedItem = ({ item }: { item: ScannedItem }) => {
+  const { icon: Icon, bgColor, color } = getIconAndColor(item.type);
 
   return (
     <View className='mb-2 flex-row items-center rounded-lg bg-card p-4 shadow-sm'>
@@ -85,11 +69,13 @@ const ScannedItem = ({ item }: { item: ScannedItemType }) => {
         <Icon size={24} color='white' />
       </View>
       <View className='flex-1'>
-        <Text className='text-lg font-semibold'>{item.title}</Text>
+        <Text className='text-lg font-semibold'>{item.name}</Text>
         <Text className='text-sm text-gray-600'>{item.description}</Text>
-        <Text className='mt-1 text-xs text-gray-400'>{item.date}</Text>
+        <Text className='mt-1 text-xs text-gray-400'>
+          {item.date.toString()}
+        </Text>
       </View>
-      <View className={cn('h-3 w-3 rounded-full', bgColor)} />
+      <View className={cn('h-3 w-3 rounded-full', color)} />
     </View>
   );
 };
