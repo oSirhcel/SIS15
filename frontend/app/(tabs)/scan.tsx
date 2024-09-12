@@ -1,9 +1,10 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { type CameraType, CameraView, useCameraPermissions } from 'expo-camera';
 import { Image } from 'expo-image';
-import { Repeat2Icon } from '@/lib/icons/Repeat2Icon';
+import { InfoIcon, RecycleIcon, Repeat2Icon } from '@/lib/icons';
+import { DRAWER_SNAP_POINTS } from '@/lib/constants';
 import {
   usePermissions as useMediaPermissions,
   saveToLibraryAsync,
@@ -13,11 +14,11 @@ import { useSharedValue } from 'react-native-reanimated';
 import {
   BottomSheetModal,
   BottomSheetView,
-  BottomSheetTrigger,
   BottomSheetHandle,
 } from '@/components/ui/bottom-sheet';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Info, RecycleIcon } from 'lucide-react-native';
+import type { ScannedItem } from '@/types/scan';
+import { cn, getIconAndColor } from '@/lib/utils';
 
 export default function Tab() {
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
@@ -26,44 +27,38 @@ export default function Tab() {
   const cameraRef = useRef<CameraView>(null);
   const [lastPhoto, setLastPhoto] = useState<string | null>(null);
 
-  const [isOpen, setIsOpen] = React.useState(false);
-
   const animatedIndex = useSharedValue<number>(0);
   const animatedPosition = useSharedValue<number>(0);
   // ref
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
   // variables
-  const snapPoints = useMemo(() => ['50%', '75%', '90%'], []);
+  const snapPoints = useMemo(() => DRAWER_SNAP_POINTS, []);
 
   // callbacks
-  const handlePresentModalPress = useCallback(() => {
-    if (isOpen) {
-      bottomSheetModalRef.current?.dismiss();
-      setIsOpen(false);
-    } else {
-      bottomSheetModalRef.current?.present();
-      setIsOpen(true);
-    }
-  }, [isOpen]);
+  const handleOpenModal = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
 
   const handleSheetChanges = useCallback((index: number) => {
     console.log('handleSheetChanges', index);
   }, []);
 
-  const scannedItem = {
+  const scannedItem: ScannedItem = {
+    id: '1',
     name: 'Plastic Water Bottle',
-    binType: 'Recycling',
-    binColor: 'blue',
-    image: '/placeholder.svg?height=200&width=200',
+    type: 'Organic Waste',
     description:
       'Plastic water bottles are recyclable and should be placed in the recycling bin. Please make sure to empty and rinse the bottle before recycling.',
-    recyclingTips: [
+    tips: [
       'Remove the cap and recycle separately',
       'Crush the bottle to save space',
       'Check for recycling symbol (#1 PET or #2 HDPE)',
     ],
+    date: new Date(),
   };
+
+  const { icon: Icon, bgColor } = getIconAndColor(scannedItem.type);
 
   React.useEffect(() => {
     const fetchLastPhoto = async () => {
@@ -112,8 +107,8 @@ export default function Tab() {
         await requestMediaPermission();
       }
 
-      handlePresentModalPress();
-      await saveToLibraryAsync(photo.uri);
+      handleOpenModal();
+      // await saveToLibraryAsync(photo.uri);
       setLastPhoto(photo.uri);
     }
   };
@@ -145,10 +140,12 @@ export default function Tab() {
             </Text>
           </View>
 
-          <View className='mb-6 flex-row items-center rounded-lg bg-blue-500 p-4'>
-            <RecycleIcon size={24} color='white' />
+          <View
+            className={cn('mb-6 flex-row items-center rounded-lg p-4', bgColor)}
+          >
+            <Icon size={24} color='white' />
             <Text className='ml-2 font-semibold text-white'>
-              Place in {scannedItem.binType} Bin
+              Place in {scannedItem.type} Bin
             </Text>
           </View>
 
@@ -160,12 +157,12 @@ export default function Tab() {
 
           <View className='rounded-lg bg-white p-4 shadow-sm'>
             <View className='mb-3 flex-row items-center'>
-              <Info size={20} color='#4b5563' />
+              <InfoIcon size={20} color='#4b5563' />
               <Text className='ml-2 text-lg font-semibold text-gray-800'>
                 Recycling Tips
               </Text>
             </View>
-            {scannedItem.recyclingTips.map((tip, index) => (
+            {scannedItem.tips.map((tip, index) => (
               <View key={index} className='mb-2 flex-row items-center'>
                 <View className='mr-2 h-2 w-2 rounded-full bg-green-500' />
                 <Text className='text-gray-600'>{tip}</Text>
