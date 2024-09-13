@@ -5,56 +5,8 @@ import { Text } from '@/components/ui/text';
 import { CameraIcon } from '@/lib/icons';
 import { cn, getIconAndColor } from '@/lib/utils';
 import { router } from 'expo-router';
-import type { ScannedItemType } from '@/types/scan';
-import { useGetUsers } from '@/api/users/use-get-users';
-
-// Mock data for scanned items
-const scannedItems: ScannedItemType[] = [
-  {
-    id: '1',
-    name: 'Plastic Bottle',
-    description: 'Empty water bottle',
-    date: new Date(),
-    type: 'Recycling',
-    tips: [
-      'Remove the cap and recycle separately',
-      'Crush the bottle to save space',
-      'Check for recycling symbol (#1 PET or #2 HDPE)',
-    ],
-  },
-  {
-    id: '2',
-    name: 'Banana Peel',
-    description: 'Organic waste',
-    date: new Date(),
-    type: 'Organic Waste',
-    tips: ['Compost the peel', 'Do not put in recycling or garbage bin'],
-  },
-  {
-    id: '3',
-    name: 'Plastic Bag',
-    description: 'Empty shopping bag',
-    date: new Date(),
-    type: 'General Waste',
-    tips: ['Reuse the bag', 'Dispose of in general waste bin'],
-  },
-  {
-    id: '4',
-    name: 'Aluminum Can',
-    description: 'Empty soda can',
-    date: new Date(),
-    type: 'Recycling',
-    tips: ['Rinse the can', 'Check for recycling symbol (#1 PET or #2 HDPE)'],
-  },
-  {
-    id: '5',
-    name: 'Paper Towel',
-    description: 'Used paper towel',
-    date: new Date(),
-    type: 'Organic Waste',
-    tips: ['Compost the paper towel', 'Do not put in recycling or garbage bin'],
-  },
-];
+import type { ScannedItemType } from '@/types';
+import { useGetUserHistory } from '@/api/history/use-get-user-history';
 
 const ScannedItem = ({ item }: { item: ScannedItemType }) => {
   const { icon: Icon, bgColor, color } = getIconAndColor(item.type);
@@ -99,11 +51,15 @@ export default function HistoryTab() {
     router.push('/scan');
   };
 
-  const userQuery = useGetUsers();
+  // Fetch the user's scan history from the API, temporarily using a mock user ID
+  // React Query has a built-in cache, and states like 'isLoading', 'isError', and 'isSuccess'
+  //!!: See https://tanstack.com/query/latest/docs/framework/react/overview
+  const historyQuery = useGetUserHistory('1');
 
-  const users = userQuery.data?.users;
+  //TODO: Implement loading states and error handling
+  const scannedItems = historyQuery.data?.items ?? [];
 
-  console.log(users);
+  console.log(scannedItems);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>

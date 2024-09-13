@@ -18,7 +18,7 @@ class ScannedItem(db.Model):
     description = db.Column(db.String(500))
     classification = db.Column(db.String(100))
     image = db.Column(db.String(200))  # URL
-    type = db.Column(db.Enum('General Waste', 'Reycling' ,'Organic Waste', name='item_type'))
+    type = db.Column(db.Enum('General Waste', 'Recycling' ,'Organic Waste', name='item_type'))
     tips = db.Column(db.ARRAY(db.String(200)))  # PostgreSQL-specific ARRAY type
     date = db.Column(db.DateTime, default=datetime.now)
     user_id = db.Column(db.String, db.ForeignKey('user.id'), nullable=False)

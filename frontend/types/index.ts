@@ -2,6 +2,7 @@
 
 export type ScannedItemType = {
   id: string;
+  userId: string;
   name: string;
   description: string;
   image?: string;
@@ -11,3 +12,18 @@ export type ScannedItemType = {
 };
 
 export type WasteType = 'General Waste' | 'Recycling' | 'Organic Waste';
+
+export type UserType = {
+  id: string;
+  username: string;
+  email: string;
+};
+
+export type GetUsersResponseType = {
+  users: UserType[];
+};
+
+export type GetHistoryResponseType = {
+  userId: string;
+  items: ScannedItemType[];
+};
