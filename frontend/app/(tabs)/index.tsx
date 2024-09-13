@@ -2,13 +2,13 @@ import React from 'react';
 import { View, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text } from '@/components/ui/text';
-import { CameraIcon, Trash2Icon, LeafIcon, RecycleIcon } from '@/lib/icons';
+import { CameraIcon } from '@/lib/icons';
 import { cn, getIconAndColor } from '@/lib/utils';
 import { router } from 'expo-router';
-import type { ScannedItem, WasteType } from '@/types/scan';
+import type { ScannedItemType } from '@/types/scan';
 
 // Mock data for scanned items
-const scannedItems: ScannedItem[] = [
+const scannedItems: ScannedItemType[] = [
   {
     id: '1',
     name: 'Plastic Bottle',
@@ -55,7 +55,7 @@ const scannedItems: ScannedItem[] = [
   },
 ];
 
-const ScannedItem = ({ item }: { item: ScannedItem }) => {
+const ScannedItem = ({ item }: { item: ScannedItemType }) => {
   const { icon: Icon, bgColor, color } = getIconAndColor(item.type);
 
   return (
