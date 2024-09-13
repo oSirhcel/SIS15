@@ -16,9 +16,9 @@ import {
 } from '@/components/ui/bottom-sheet';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useGetScannedItemData } from '@/api/useGetScannedItemData';
 import { ScannedItemDrawer } from '@/components/scan/scanned-item-drawer';
 import type { ScannedItemType } from '@/types';
+import { useScanItem } from '@/api/scan/use-scan-item';
 
 export default function Tab() {
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
@@ -33,6 +33,8 @@ export default function Tab() {
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
   const snapPoints = useMemo(() => DRAWER_SNAP_POINTS, []);
+
+  const mutation = useScanItem();
 
   const handleOpenModal = useCallback(() => {
     bottomSheetModalRef.current?.present();
@@ -76,20 +78,25 @@ export default function Tab() {
 
   const takePicture = async () => {
     if (cameraRef.current) {
-      const photo = await cameraRef.current.takePictureAsync();
+      const photo = await cameraRef.current.takePictureAsync({ base64: true });
       if (!photo) {
         console.log('No photo taken');
         return;
       }
+
       if (!mediaPermission.granted) {
         await requestMediaPermission();
       }
 
       handleOpenModal();
       //TODO: Error handling
-      const res = await useGetScannedItemData();
+      const data = await mutation.mutateAsync({
+        userId: '1',
+        img_base64: photo.base64!,
+      });
+
       setScannedItem({
-        ...res,
+        ...data,
         image: photo.uri,
       });
     }
