@@ -18,7 +18,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useGetScannedItemData } from '@/api/useGetScannedItemData';
 import { ScannedItemDrawer } from '@/components/scan/scanned-item-drawer';
-import type { ScannedItemType } from '@/types/scan';
+import type { ScannedItemType } from '@/types';
 
 export default function Tab() {
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();

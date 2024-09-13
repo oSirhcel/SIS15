@@ -1,13 +1,14 @@
 //MOCK API
 //TODO: Implement API call to get scanned item
 
-import type { ScannedItemType } from '@/types/scan';
+import type { ScannedItemType } from '@/types';
 
 export function useGetScannedItemData(): Promise<ScannedItemType> {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({
         id: '1',
+        userId: '1',
         name: 'Plastic Water Bottle',
         type: 'Organic Waste',
         description:
