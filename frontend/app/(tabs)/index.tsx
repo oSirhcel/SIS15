@@ -6,6 +6,7 @@ import { CameraIcon } from '@/lib/icons';
 import { cn, getIconAndColor } from '@/lib/utils';
 import { router } from 'expo-router';
 import type { ScannedItemType } from '@/types/scan';
+import { useGetUsers } from '@/api/users/use-get-users';
 
 // Mock data for scanned items
 const scannedItems: ScannedItemType[] = [
@@ -97,6 +98,12 @@ export default function HistoryTab() {
     // Implement the logic to navigate to the scanning screen
     router.push('/scan');
   };
+
+  const userQuery = useGetUsers();
+
+  const users = userQuery.data?.users;
+
+  console.log(users);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
