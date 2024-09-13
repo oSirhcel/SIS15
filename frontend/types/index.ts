@@ -27,3 +27,8 @@ export type GetHistoryResponseType = {
   userId: string;
   items: ScannedItemType[];
 };
+
+export type ScanItemRequestType = {
+  userId: string;
+  img_base64: string;
+};
