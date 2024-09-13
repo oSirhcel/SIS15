@@ -10,6 +10,7 @@ import { NAV_THEME } from '@/lib/constants';
 import { useColorScheme } from '@/lib/useColourScheme';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@/components/ui/bottom-sheet';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const LIGHT_THEME: Theme = {
   dark: false,
@@ -31,6 +32,8 @@ void SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const { colorScheme, setColorScheme, isDarkColorScheme } = useColorScheme();
   const [isColorSchemeLoaded, setIsColorSchemeLoaded] = React.useState(false);
+
+  const queryClient = new QueryClient();
 
   React.useEffect(() => {
     void (async () => {
@@ -62,15 +65,17 @@ export default function RootLayout() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <BottomSheetModalProvider>
-        <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
-          <StatusBar style={isDarkColorScheme ? 'light' : 'dark'} />
-          <Stack>
-            <Stack.Screen name={'(tabs)'} options={{ headerShown: false }} />
-          </Stack>
-        </ThemeProvider>
-      </BottomSheetModalProvider>
-    </GestureHandlerRootView>
+    <QueryClientProvider client={queryClient}>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <BottomSheetModalProvider>
+          <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
+            <StatusBar style={isDarkColorScheme ? 'light' : 'dark'} />
+            <Stack>
+              <Stack.Screen name={'(tabs)'} options={{ headerShown: false }} />
+            </Stack>
+          </ThemeProvider>
+        </BottomSheetModalProvider>
+      </GestureHandlerRootView>
+    </QueryClientProvider>
   );
 }
