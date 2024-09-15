@@ -18,9 +18,35 @@ import {
   RecycleIcon,
   Image as ImageIcon,
 } from 'lucide-react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSharedValue } from 'react-native-reanimated';
-import { scannedItemsEmitter, ScannedItemType } from './types';
+import { ScannedItemType } from './types';
+
+const mockupData: ScannedItemType[] = [
+  {
+    id: '1',
+    title: 'Plastic Water Bottle',
+    description: 'Empty water bottle',
+    date: '2023-12-15',
+    type: 'recyclable',
+    imageUri: 'path/to/image',
+  },
+  {
+    id: '2',
+    title: 'Banana Peel',
+    description: 'Biodegradable waste',
+    date: '2023-12-14',
+    type: 'biodegradable',
+    imageUri: 'path/to/image',
+  },
+  {
+    id: '3',
+    title: 'Used Paper Towel',
+    description: 'Non-recyclable waste',
+    date: '2023-12-13',
+    type: 'trash',
+    imageUri: 'path/to/image',
+  },
+];
 
 const getIconAndColor = (type: 'recyclable' | 'biodegradable' | 'trash') => {
   switch (type) {
@@ -84,7 +110,9 @@ const CallToActionButton = ({ onPress }: { onPress: () => void }) => (
 );
 
 export default function HistoryTab() {
-  const [scannedItems, setScannedItems] = useState<ScannedItemType[]>([]);
+  const [scannedItems, setScannedItems] = useState<ScannedItemType[]>(
+    mockupData,
+  );
   const [selectedItem, setSelectedItem] = useState<ScannedItemType | null>(null);
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -110,37 +138,9 @@ export default function HistoryTab() {
     router.push('/scan');
   };
 
-  const loadScannedItems = async () => {
-    try {
-      const storedItems = await AsyncStorage.getItem('scannedItems');
-      if (storedItems) {
-        setScannedItems(JSON.parse(storedItems));
-      }
-    } catch (error) {
-      console.error('Error loading scanned items:', error);
-    }
-  };
-
-  React.useEffect(() => {
-    // Load scanned items initially
-    loadScannedItems();
-
-    // Listen for new scanned items using mitt's "on" method
-    const updateScannedItemsListener = () => {
-      loadScannedItems();
-    };
-
-    scannedItemsEmitter.on('newItemScanned', updateScannedItemsListener);
-
-    // Clean up the listener using mitt's "off" method
-    return () => {
-      scannedItemsEmitter.off('newItemScanned', updateScannedItemsListener);
-    };
-  }, []);
-
   const handleItemPress = (item: ScannedItemType) => {
     setSelectedItem(item);
-    handlePresentModalPress(); 
+    handlePresentModalPress();
   };
 
   const closeBottomSheet = () => {
