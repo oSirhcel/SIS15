@@ -1,5 +1,3 @@
-import mitt from 'mitt';
-
 export type ScannedItemType = {
   id: string;
   title: string;
@@ -8,6 +6,3 @@ export type ScannedItemType = {
   type: 'recyclable' | 'biodegradable' | 'trash';
   imageUri: string | null;
 };
-
-// Create and export the event emitter using mitt
-export const scannedItemsEmitter = mitt();
