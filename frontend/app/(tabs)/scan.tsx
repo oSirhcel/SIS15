@@ -23,7 +23,9 @@ import {
   RecycleIcon,
   Image as ImageIcon,
   Camera as CameraIcon,
+  Trash2,
 } from 'lucide-react-native';
+import { router } from 'expo-router';
 
 export default function Tab() {
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
@@ -139,6 +141,15 @@ export default function Tab() {
     setIsOpen(false);
   };
 
+  const handleScanAnotherPhoto = () => {
+    closeBottomSheet();
+    router.push('/scan');
+  };
+
+  const handleRemovePhoto = () => {
+    closeBottomSheet();
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <BottomSheetModal
@@ -199,21 +210,21 @@ export default function Tab() {
 
           <View className='mt-6 flex-row justify-between'>
             <TouchableOpacity
-              onPress={pickImageFromLibrary}
-              className='mb-6 flex-row items-center rounded-lg bg-blue-500 p-4'
-            >
-              <ImageIcon size={20} color='white' />
-              <Text className='ml-2 font-semibold text-white'>
-                Select from Album
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={closeBottomSheet}
-              className='mb-6 flex-row items-center rounded-lg bg-red-500 p-4'
+              onPress={handleScanAnotherPhoto}
+              className='mb-6 flex-1 mr-2 flex-row items-center justify-center rounded-lg bg-blue-500 p-4'
             >
               <CameraIcon size={20} color='white' />
               <Text className='ml-2 font-semibold text-white'>
-                Return to Camera
+                Scan Another Photo
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleRemovePhoto}
+              className='mb-6 flex-1 ml-2 flex-row items-center justify-center rounded-lg bg-red-500 p-4'
+            >
+              <Trash2 size={20} color='white' />
+              <Text className='ml-2 font-semibold text-white'>
+                Remove Photo
               </Text>
             </TouchableOpacity>
           </View>
