@@ -3,8 +3,6 @@ import { View, Text, Image } from 'react-native';
 import { cn, getIconAndColor } from '@/lib/utils';
 import { InfoIcon } from '@/lib/icons';
 import type { ScannedItem } from '@/types';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import { ImageIcon } from 'lucide-react-native';
 
 type Props = {
   item: ScannedItem;
@@ -12,7 +10,6 @@ type Props = {
 
 export const ScannedItemDrawer = ({ item }: Props) => {
   return (
-
     <BottomSheetView className='flex-1 px-4 pb-6 pt-2'>
       <View className='mb-4 mt-4 flex-row items-center justify-between'>
         <Text className='text-2xl font-bold text-gray-800'>{item.name}</Text>
