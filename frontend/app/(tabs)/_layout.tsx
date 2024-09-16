@@ -1,9 +1,9 @@
 import { Tabs } from 'expo-router';
-import { CameraIcon, HomeIcon } from '@/lib/icons';
+import { CameraIcon, HomeIcon, Clock4Icon } from '@/lib/icons';
 
 export default function TabLayout() {
   return (
-    <Tabs screenOptions={{ tabBarActiveTintColor: 'blue' }}>
+    <Tabs>
       <Tabs.Screen
         name='index'
         options={{
@@ -18,6 +18,14 @@ export default function TabLayout() {
           headerShown: false,
           title: 'Scan',
           tabBarIcon: ({ color }) => <CameraIcon size={28} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name='history'
+        options={{
+          headerShown: false,
+          title: 'History',
+          tabBarIcon: ({ color }) => <Clock4Icon size={28} color={color} />,
         }}
       />
     </Tabs>

@@ -1,34 +1,34 @@
 //TODO: Change the types to match the actual data types from the backend
 
-export type ScannedItemType = {
+export type ScannedItem = {
   id: string;
   userId: string;
   name: string;
   description: string;
   image?: string;
-  type: WasteType;
+  type: Waste;
   tips: string[];
   date: Date;
 };
 
-export type WasteType = 'General Waste' | 'Recycling' | 'Organic Waste';
+export type Waste = 'General Waste' | 'Recycling' | 'Organic Waste';
 
-export type UserType = {
+export type User = {
   id: string;
   username: string;
   email: string;
 };
 
-export type GetUsersResponseType = {
-  users: UserType[];
+export type GetUsersResponse = {
+  users: User[];
 };
 
-export type GetHistoryResponseType = {
+export type GetHistoryResponse = {
   userId: string;
-  items: ScannedItemType[];
+  items: ScannedItem[];
 };
 
-export type ScanItemRequestType = {
+export type ScanItemRequest = {
   userId: string;
   img_base64: string;
 };

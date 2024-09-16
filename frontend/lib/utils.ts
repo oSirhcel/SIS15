@@ -1,5 +1,5 @@
 import { clsx, type ClassValue } from 'clsx';
-import type { WasteType } from '@/types/scan';
+import type { Waste } from '@/types';
 import { LeafIcon, RecycleIcon, Trash2Icon } from '@/lib/icons';
 import { twMerge } from 'tailwind-merge';
 
@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function getIconAndColor(type: WasteType) {
+export function getIconAndColor(type: Waste) {
   switch (type) {
     case 'General Waste':
       return {

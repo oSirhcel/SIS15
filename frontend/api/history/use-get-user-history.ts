@@ -1,8 +1,8 @@
-import type { GetHistoryResponseType } from '@/types';
+import type { GetHistoryResponse } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 
 //Development URL
-const url = 'https://4d9pbj7j-5000.aue.devtunnels.ms';
+const url = 'https://37rq6tqm-5000.aue.devtunnels.ms';
 
 export const useGetUserHistory = (userId: string) => {
   const query = useQuery({
@@ -22,7 +22,7 @@ export const useGetUserHistory = (userId: string) => {
         throw new Error('Network response was not ok');
       }
 
-      const data = (await response.json()) as GetHistoryResponseType;
+      const data = (await response.json()) as GetHistoryResponse;
 
       console.log(data);
 

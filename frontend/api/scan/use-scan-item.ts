@@ -1,14 +1,17 @@
-import type { ScanItemRequestType, ScannedItemType } from '@/types';
+import type { ScanItemRequest, ScannedItem } from '@/types';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 
 //Forwarded Backend URL
-const url = 'https://4d9pbj7j-5000.aue.devtunnels.ms';
+const url = 'https://37rq6tqm-5000.aue.devtunnels.ms';
 
 export const useScanItem = () => {
   const queryClient = useQueryClient();
 
-  const mutation = useMutation<ScannedItemType, Error, ScanItemRequestType>({
+  const mutation = useMutation<ScannedItem, Error, ScanItemRequest>({
     mutationFn: async (json) => {
+      if (json.img_base64) {
+        console.log(json.img_base64.length);
+      }
       const response = await fetch(`${url}/scan`, {
         method: 'POST',
         headers: {
@@ -17,15 +20,11 @@ export const useScanItem = () => {
         body: JSON.stringify(json),
       });
 
-      console.log(response.ok);
-
       if (!response.ok) {
         throw new Error('Internal Server Error');
       }
 
-      const data = (await response.json()) as ScannedItemType;
-
-      console.log(data);
+      const data = (await response.json()) as ScannedItem;
 
       return data;
     },

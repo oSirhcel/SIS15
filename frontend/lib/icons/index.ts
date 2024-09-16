@@ -6,6 +6,8 @@ import {
   Repeat2Icon,
   Trash2Icon,
   LeafIcon,
+  Clock4Icon,
+  ChevronDownIcon,
 } from 'lucide-react-native';
 
 import { iconWithClassName } from '@/lib/icons/iconWithClassName';
@@ -16,6 +18,11 @@ iconWithClassName(CameraIcon);
 iconWithClassName(HomeIcon);
 iconWithClassName(InfoIcon);
 iconWithClassName(RecycleIcon);
+iconWithClassName(Repeat2Icon);
+iconWithClassName(Trash2Icon);
+iconWithClassName(LeafIcon);
+iconWithClassName(Clock4Icon);
+iconWithClassName(ChevronDownIcon);
 
 export {
   CameraIcon,
@@ -25,4 +32,6 @@ export {
   Repeat2Icon,
   Trash2Icon,
   LeafIcon,
+  Clock4Icon,
+  ChevronDownIcon,
 };
