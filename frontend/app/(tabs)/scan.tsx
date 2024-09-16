@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { type CameraType, CameraView, useCameraPermissions } from 'expo-camera';
-import * as ImagePicker from 'expo-image-picker';
+
 import { Image } from 'expo-image';
 import { Repeat2Icon } from '@/lib/icons';
 import { DRAWER_SNAP_POINTS } from '@/lib/constants';
@@ -10,6 +10,7 @@ import {
   usePermissions as useMediaPermissions,
   getAssetsAsync,
 } from 'expo-media-library';
+import * as ImagePicker from 'expo-image-picker';
 import { useSharedValue } from 'react-native-reanimated';
 import {
   BottomSheetModal,
@@ -179,14 +180,22 @@ export default function Tab() {
             >
               {/* Conditionally render the image if lastPhoto exists */}
               {lastPhoto && (
-                <Image
-                  source={{ uri: lastPhoto }}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                  }}
-                  contentFit='cover'
-                />
+                <TouchableOpacity // Always render the TouchableOpacity
+                  onPress={pickImageFromLibrary}
+                  className='h-16 w-12 overflow-hidden rounded-md border-2 border-white'
+                >
+                  {/* Conditionally render the image if lastPhoto exists */}
+                  {lastPhoto && (
+                    <Image
+                      source={{ uri: lastPhoto }}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                      }}
+                      contentFit='cover'
+                    />
+                  )}
+                </TouchableOpacity>
               )}
             </TouchableOpacity>
             <TouchableOpacity
