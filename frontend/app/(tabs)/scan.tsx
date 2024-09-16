@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { type CameraType, CameraView, useCameraPermissions } from 'expo-camera';
+import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import { Repeat2Icon } from '@/lib/icons';
 import { DRAWER_SNAP_POINTS } from '@/lib/constants';
@@ -17,7 +18,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ScannedItemDrawer } from '@/components/scan/scanned-item-drawer';
-import type { ScannedItemType } from '@/types';
+import type { ScannedItem } from '@/types';
 import { useScanItem } from '@/api/scan/use-scan-item';
 
 export default function Tab() {
@@ -26,7 +27,7 @@ export default function Tab() {
   const [mediaPermission, requestMediaPermission] = useMediaPermissions();
   const cameraRef = useRef<CameraView>(null);
   const [lastPhoto, setLastPhoto] = useState<string | null>(null);
-  const [scannedItem, setScannedItem] = useState<ScannedItemType | null>(null);
+  const [scannedItem, setScannedItem] = useState<ScannedItem | null>(null);
 
   const animatedIndex = useSharedValue<number>(0);
   const animatedPosition = useSharedValue<number>(0);
@@ -102,8 +103,44 @@ export default function Tab() {
     }
   };
 
+  const handleAnimate = (from: number, to: number) => {
+    if (to === -1) {
+      handleClose();
+    }
+  };
+
+  const handleClose = () => {
+    setScannedItem(null);
+    console.log('closed');
+  };
+
   const changeFacing = () => {
     setFacing((facing) => (facing === 'back' ? 'front' : 'back'));
+  };
+
+  const pickImageFromLibrary = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: false,
+      quality: 1,
+      base64: true,
+    });
+
+    if (!result.canceled && result.assets) {
+      const photo = result.assets[0];
+
+      handleOpenModal();
+      //!! Fix because it works on web but not ios ?
+      const data = await mutation.mutateAsync({
+        userId: '1',
+        img_base64: photo.base64!,
+      });
+
+      setScannedItem({
+        ...data,
+        image: photo.uri,
+      });
+    }
   };
 
   return (
@@ -112,7 +149,9 @@ export default function Tab() {
         ref={bottomSheetModalRef}
         index={1}
         snapPoints={snapPoints}
-        onClose={() => setScannedItem(null)}
+        onClose={handleClose}
+        onAnimate={handleAnimate}
+        enablePanDownToClose
         handleComponent={() => (
           <BottomSheetHandle
             className='mt-2 bg-green-300'
@@ -134,8 +173,12 @@ export default function Tab() {
       >
         <View className='absolute bottom-0 left-0 right-0 h-24 bg-black'>
           <View className='flex-1 flex-row items-center justify-between px-4'>
-            {lastPhoto && (
-              <TouchableOpacity className='h-16 w-12 overflow-hidden rounded-md border-2 border-white'>
+            <TouchableOpacity // Always render the TouchableOpacity
+              onPress={pickImageFromLibrary}
+              className='h-16 w-12 overflow-hidden rounded-md border-2 border-white'
+            >
+              {/* Conditionally render the image if lastPhoto exists */}
+              {lastPhoto && (
                 <Image
                   source={{ uri: lastPhoto }}
                   style={{
@@ -144,8 +187,8 @@ export default function Tab() {
                   }}
                   contentFit='cover'
                 />
-              </TouchableOpacity>
-            )}
+              )}
+            </TouchableOpacity>
             <TouchableOpacity
               onPress={takePicture}
               className='h-16 w-16 items-center justify-center rounded-full bg-white'
