@@ -15,10 +15,10 @@ warnings.filterwarnings("ignore")
 
 # Argument parsing
 parser = argparse.ArgumentParser()
-parser.add_argument('--batch_size', type=int, default=64, help='Batch size for training')
+parser.add_argument('--batch_size', type=int, default=640, help='Batch size for training')
 parser.add_argument('--dataset', type=str, default='garbage', help='Dataset to use')
 parser.add_argument('--model_size', type=str, default='ViT-B/32', choices=tools.BACKBONES, help='Pretrained CLIP model to use')
-parser.add_argument('--epochs', type=int, default=10, help='Number of training epochs')
+parser.add_argument('--epochs', type=int, default=16, help='Number of training epochs')
 parser.add_argument('--save_model', type=str, default='', help='Filename to save the trained model')
 opt = parser.parse_args()
 
@@ -58,6 +58,7 @@ if __name__ == '__main__':
                 image_encodings = model.encode_image(images)
                 image_encodings = F.normalize(image_encodings)
 
+            image_encodings =image_encodings.float()
             outputs = classifier(image_encodings)
             loss = criterion(outputs, labels)
 
