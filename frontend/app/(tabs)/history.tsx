@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { View, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text } from '@/components/ui/text';
-import { Trash2, Recycle, Leaf } from 'lucide-react-native';
+import { Trash2, Recycle, Leaf, Pencil, X } from 'lucide-react-native';
 import { CameraIcon } from '@/lib/icons/CameraIcon';
 import { cn } from '@/lib/utils';
 import { router } from 'expo-router';
@@ -20,13 +20,15 @@ import {
 } from 'lucide-react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import { ScannedItemType } from './types';
+import { Colors } from '@/constants/Colors';
+import { useColorScheme } from '@/lib/useColourScheme';
 
 const mockupData: ScannedItemType[] = [
   {
     id: '1',
     title: 'Plastic Water Bottle',
     description: 'Empty water bottle',
-    date: '2023-12-15',
+    date: '2024-01-01',
     type: 'recyclable',
     imageUri: 'path/to/image',
   },
@@ -34,7 +36,7 @@ const mockupData: ScannedItemType[] = [
     id: '2',
     title: 'Banana Peel',
     description: 'Biodegradable waste',
-    date: '2023-12-14',
+    date: '2024-01-10',
     type: 'biodegradable',
     imageUri: 'path/to/image',
   },
@@ -42,7 +44,7 @@ const mockupData: ScannedItemType[] = [
     id: '3',
     title: 'Used Paper Towel',
     description: 'Non-recyclable waste',
-    date: '2023-12-13',
+    date: '2024-12-31',
     type: 'trash',
     imageUri: 'path/to/image',
   },
@@ -68,16 +70,28 @@ const getIconAndColor = (type: 'recyclable' | 'biodegradable' | 'trash') => {
 const ScannedItem = ({
   item,
   onPress,
+  isSelected,
 }: {
   item: ScannedItemType;
   onPress: () => void;
+  isSelected: boolean;
 }) => {
   const { icon: Icon, color, bgColor } = getIconAndColor(item.type);
+  const { isDarkColorScheme } = useColorScheme();
 
   return (
     <TouchableOpacity
       onPress={onPress}
-      className='mb-2 flex-row items-center rounded-lg bg-card p-4 shadow-sm'
+      className={cn(
+        'mb-2 flex-row items-center rounded-lg p-4',
+        isSelected
+          ? isDarkColorScheme
+            ? 'bg-gray-800'
+            : 'bg-blue-100'
+          : isDarkColorScheme
+            ? Colors.dark.background
+            : Colors.light.background
+      )}
     >
       <View
         className={cn(
@@ -97,17 +111,28 @@ const ScannedItem = ({
   );
 };
 
-const CallToActionButton = ({ onPress }: { onPress: () => void }) => (
-  <TouchableOpacity
-    onPress={onPress}
-    className='mt-4 flex-row items-center justify-center rounded-lg bg-blue-500 p-4'
-    accessibilityRole='button'
-    accessibilityLabel='Scan new item'
-  >
-    <CameraIcon className='mr-2 size-6 text-primary' />
-    <Text className='text-lg font-semibold text-primary'>Scan New Item</Text>
-  </TouchableOpacity>
-);
+const CallToActionButton = ({ onPress }: { onPress: () => void }) => {
+  const { isDarkColorScheme } = useColorScheme();
+  const textColor = isDarkColorScheme
+    ? Colors.dark.tint
+    : Colors.light.tint;
+
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      className='mt-4 flex-row items-center justify-center rounded-lg bg-blue-500 p-4'
+      accessibilityRole='button'
+      accessibilityLabel='Scan new item'
+    >
+      <CameraIcon className='mr-2 size-6 text-primary' />
+      <Text
+        className={cn('text-lg font-semibold text-primary', textColor)}
+      >
+        Scan New Item
+      </Text>
+    </TouchableOpacity>
+  );
+};
 
 export default function HistoryTab() {
   const [scannedItems, setScannedItems] = useState<ScannedItemType[]>(
@@ -115,6 +140,9 @@ export default function HistoryTab() {
   );
   const [selectedItem, setSelectedItem] = useState<ScannedItemType | null>(null);
   const [isOpen, setIsOpen] = React.useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const { isDarkColorScheme } = useColorScheme();
 
   const animatedIndex = useSharedValue<number>(0);
   const animatedPosition = useSharedValue<number>(0);
@@ -138,15 +166,39 @@ export default function HistoryTab() {
     router.push('/scan');
   };
 
-  const handleItemPress = (item: ScannedItemType) => {
-    setSelectedItem(item);
-    handlePresentModalPress();
+  const handleItemPress = (itemId: string) => {
+    if (isEditing) {
+      const updatedSelectedItems = selectedItems.includes(itemId)
+        ? selectedItems.filter((id) => id !== itemId)
+        : [...selectedItems, itemId];
+      setSelectedItems(updatedSelectedItems);
+    } else {
+      const item = scannedItems.find((item) => item.id === itemId);
+      setSelectedItem(item || null);
+      handlePresentModalPress();
+    }
   };
 
   const closeBottomSheet = () => {
     bottomSheetModalRef.current?.dismiss();
     setIsOpen(false);
   };
+
+  const handleScanAnotherPhoto = () => {
+    closeBottomSheet();
+    router.push('/scan');
+  };
+
+  const handleRemovePhoto = () => {
+    closeBottomSheet();
+  };
+
+  const toggleEditMode = () => {
+    setIsEditing(!isEditing);
+    setSelectedItems([]); // Clear selections when exiting edit mode
+  };
+
+  const textColor = isDarkColorScheme ? Colors.dark.text : Colors.light.text;
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -217,23 +269,21 @@ export default function HistoryTab() {
 
               <View className='mt-6 flex-row justify-between'>
                 <TouchableOpacity
-                  onPress={() => {
-                    // Implement logic to select image from album
-                  }}
-                  className='mb-6 flex-row items-center rounded-lg bg-blue-500 p-4'
-                >
-                  <ImageIcon size={20} color='white' />
-                  <Text className='ml-2 font-semibold text-white'>
-                    Select from Album
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={closeBottomSheet}
-                  className='mb-6 flex-row items-center rounded-lg bg-red-500 p-4'
+                  onPress={handleScanAnotherPhoto}
+                  className='mb-6 flex-1 mr-2 flex-row items-center justify-center rounded-lg bg-blue-500 p-4'
                 >
                   <CameraIcon size={20} color='white' />
                   <Text className='ml-2 font-semibold text-white'>
-                    Return to History
+                    Scan Another Item
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleRemovePhoto}
+                  className='mb-6 flex-1 ml-2 flex-row items-center justify-center rounded-lg bg-red-500 p-4'
+                >
+                  <Trash2 size={20} color='white' />
+                  <Text className='ml-2 font-semibold text-white'>
+                    Remove Item
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -242,14 +292,29 @@ export default function HistoryTab() {
         </BottomSheetView>
       </BottomSheetModal>
       <View className='flex-1 px-4 py-2'>
-        <Text className='mb-4 text-2xl font-bold'>Scan History</Text>
+        <View className='mb-4 flex-row items-center justify-between'>
+          <Text
+            className={cn('text-2xl font-bold', textColor)}
+          >
+            {isEditing ? `Selected ${selectedItems.length} items` : 'Scan History'}
+          </Text>
+          <TouchableOpacity onPress={toggleEditMode}>
+            {isEditing ? (
+              <X size={24} color={textColor} />
+            ) : (
+              <Pencil size={24} color={textColor} />
+            )}
+          </TouchableOpacity>
+        </View>
+
         {scannedItems.length > 0 ? (
           <ScrollView showsVerticalScrollIndicator={false}>
             {scannedItems.map((item) => (
               <ScannedItem
                 key={item.id}
                 item={item}
-                onPress={() => handleItemPress(item)}
+                onPress={() => handleItemPress(item.id)}
+                isSelected={isEditing && selectedItems.includes(item.id)}
               />
             ))}
           </ScrollView>
