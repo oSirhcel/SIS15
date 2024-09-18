@@ -40,7 +40,12 @@ if __name__ == '__main__':
         param.requires_grad = False  # Freezing the image encoder
 
     # Add classifier head
-    classifier = torch.nn.Linear(512, len(dataset.label_to_idx))  # Assuming CLIP embedding is 512-dim
+    if opt.model_size == 'ViT-L/14':
+        classifier_input_dim = 768
+    elif opt.model_size == 'ViT-B/32':
+        classifier_input_dim = 512
+
+    classifier = torch.nn.Linear(classifier_input_dim, len(dataset.classes))  # Use correct input dimension
     classifier.to(device)
 
     # Set optimizer and loss
