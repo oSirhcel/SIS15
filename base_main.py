@@ -45,7 +45,7 @@ if __name__ == '__main__':
     elif opt.model_size == 'ViT-B/32':
         classifier_input_dim = 512
 
-    classifier = torch.nn.Linear(classifier_input_dim, len(dataset.classes))  # Use correct input dimension
+    classifier = torch.nn.Linear(classifier_input_dim, len(dataset.label_to_idx))  # Use correct input dimension
     classifier.to(device)
 
     # Set optimizer and loss
