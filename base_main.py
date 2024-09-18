@@ -50,9 +50,10 @@ if __name__ == '__main__':
 
     # Set optimizer and loss
     # optimizer = torch.optim.Adam(list(model.parameters()) + list(classifier.parameters()), lr=1e-5)
-    # criterion = torch.nn.CrossEntropyLoss()
+
 
     optimizer = torch.optim.Adam(classifier.parameters(), lr=1e-5)  # Only optimize classifier head
+    criterion = torch.nn.CrossEntropyLoss()
 
     # Fine-tuning loop
     model.train()
