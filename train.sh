@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # parameters
-BATCH_SIZE=64
-EPOCHS=10
-MODEL_SIZE="ViT-B/32"
-SAVE_MODEL="garbage_classification_model.pth"
+BATCH_SIZE=640
+EPOCHS=16
+MODEL_SIZE="ViT-L/14"
+SAVE_MODEL="garbage_classification_model1.pth"
 
 # run
 python base_main.py \

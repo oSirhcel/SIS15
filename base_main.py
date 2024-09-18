@@ -35,13 +35,19 @@ if __name__ == '__main__':
     print(colored(f"\nLoading CLIP model [{opt.model_size}] ...", "yellow", attrs=["bold"]))
     model, preprocess = clip.load(opt.model_size, device=device, jit=False)
 
+    # Freeze the backbone (image encoder)
+    for param in model.visual.parameters():  # 'model.visual' is the image encoder part of CLIP
+        param.requires_grad = False  # Freezing the image encoder
+
     # Add classifier head
     classifier = torch.nn.Linear(512, len(dataset.label_to_idx))  # Assuming CLIP embedding is 512-dim
     classifier.to(device)
 
     # Set optimizer and loss
-    optimizer = torch.optim.Adam(list(model.parameters()) + list(classifier.parameters()), lr=1e-5)
-    criterion = torch.nn.CrossEntropyLoss()
+    # optimizer = torch.optim.Adam(list(model.parameters()) + list(classifier.parameters()), lr=1e-5)
+    # criterion = torch.nn.CrossEntropyLoss()
+
+    optimizer = torch.optim.Adam(classifier.parameters(), lr=1e-5)  # Only optimize classifier head
 
     # Fine-tuning loop
     model.train()
