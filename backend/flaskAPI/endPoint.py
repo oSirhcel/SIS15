@@ -38,12 +38,12 @@ def get_image():
     if file:
         # Save the file
         file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+
         file.save(file_path)
         file_response = f"File {file.filename} uploaded successfully.", 200
         file_path = os.path.join(UPLOAD_FOLDER, file.filename)
         return json.dumps({"content" : f"File {file.filename} is a xyz you should blah blah blah", "code": 200})
     
-
 if __name__ == '__main__':
     app.run(debug=True)
 
