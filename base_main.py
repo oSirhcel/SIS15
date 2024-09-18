@@ -18,7 +18,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--batch_size', type=int, default=640, help='Batch size for training')
 parser.add_argument('--dataset', type=str, default='garbage', help='Dataset to use')
 parser.add_argument('--model_size', type=str, default='ViT-B/32', choices=tools.BACKBONES, help='Pretrained CLIP model to use')
-parser.add_argument('--epochs', type=int, default=16, help='Number of training epochs')
+parser.add_argument('--epochs', type=int, default=30, help='Number of training epochs')
 parser.add_argument('--save_model', type=str, default='', help='Filename to save the trained model')
 opt = parser.parse_args()
 
@@ -29,7 +29,7 @@ if __name__ == '__main__':
     # Set seed and load dataset
     tools.seed_everything(42)
     opt, dataset = tools.setup(opt)
-    dataloader = DataLoader(dataset, batch_size=opt.batch_size, shuffle=True, num_workers=8)
+    dataloader = DataLoader(dataset, batch_size=opt.batch_size, shuffle=True, num_workers=15)
 
     # Load CLIP model
     print(colored(f"\nLoading CLIP model [{opt.model_size}] ...", "yellow", attrs=["bold"]))
