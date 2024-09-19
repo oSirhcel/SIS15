@@ -26,6 +26,8 @@ import {
   Trash2,
 } from 'lucide-react-native';
 import { router } from 'expo-router';
+import { useScanItem } from '@/api/scan/use-scan-item';
+import { ScannedItemType } from '@/types/types';
 
 export default function Tab() {
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
@@ -52,19 +54,9 @@ export default function Tab() {
     console.log('handleSheetChanges', index);
   }, []);
 
-  const scannedItem = {
-    name: 'Plastic Water Bottle',
-    binType: 'Recycling',
-    binColor: 'blue',
-    image: '/placeholder.svg?height=200&width=200',
-    description:
-      'Plastic water bottles are recyclable and should be placed in the recycling bin. Please make sure to empty and rinse the bottle before recycling.',
-    recyclingTips: [
-      'Remove the cap and recycle separately',
-      'Crush the bottle to save space',
-      'Check for recycling symbol (#1 PET or #2 HDPE)',
-    ],
-  };
+  const { mutate: scanItem, isPending: isScanning } = useScanItem();
+
+  const [scannedItem, setScannedItem] = useState<ScannedItemType>();
 
   React.useEffect(() => {
     const fetchLastPhoto = async () => {
@@ -104,7 +96,9 @@ export default function Tab() {
 
   const takePicture = async () => {
     if (cameraRef.current) {
-      const photo = await cameraRef.current.takePictureAsync();
+      const photo = await cameraRef.current.takePictureAsync({
+        base64: true, // Capture the image as a base64 string
+      });
       if (!photo) {
         console.log('No photo taken');
         return;
@@ -113,7 +107,30 @@ export default function Tab() {
         await requestMediaPermission();
       }
 
-      handlePresentModalPress();
+      // Send the base64 image data to the backend
+      if (photo.base64) { // Check if photo.base64 is defined
+        scanItem(
+          {
+            img_base64: photo.base64,
+            userId: '1', // Replace with actual user ID
+          },
+          {
+            onSuccess: (data) => {
+              setScannedItem(data);
+              handlePresentModalPress();
+            },
+            onError: (error) => {
+              console.error('Error scanning item:', error);
+              // Handle error, e.g., show an error message to the user
+            },
+          },
+        );
+      } else {
+        console.error('Error: Image data is undefined');
+        throw new Error()
+        // Handle the error, e.g., show an error message to the user
+      }
+
       await saveToLibraryAsync(photo.uri);
       setLastPhoto(photo.uri);
     }
@@ -128,11 +145,35 @@ export default function Tab() {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: false,
       quality: 1,
+      base64: true, // Get the image as a base64 string
     });
-
+  
     if (!result.canceled && result.assets.length > 0) {
       setLastPhoto(result.assets[0].uri);
-      handlePresentModalPress();
+  
+      // Send the base64 image data to the backend
+      if (result.assets[0].base64) { // Check if base64 is defined
+        scanItem(
+          {
+            img_base64: result.assets[0].base64,
+            userId: '1', // Replace with actual user ID
+          },
+          {
+            onSuccess: (data) => {
+              setScannedItem(data);
+              handlePresentModalPress();
+            },
+            onError: (error) => {
+              console.error('Error scanning item:', error);
+              // Handle error, e.g., show an error message to the user
+            },
+          },
+        );
+      } else {
+        console.error('Error: Image data is undefined');
+        throw new Error()
+        // Handle the error, e.g., show an error message to the user
+      }
     }
   };
 
@@ -174,60 +215,68 @@ export default function Tab() {
               contentFit='contain'
             />
           )}
-          <View className='mt-4 mb-4 flex-row items-center justify-between'>
-            <Text className='text-2xl font-bold text-gray-800'>
-              {scannedItem.name}
-            </Text>
-          </View>
-
-          <View className='mb-6 flex-row items-center rounded-lg bg-blue-500 p-4'>
-            <RecycleIcon size={24} color='white' />
-            <Text className='ml-2 font-semibold text-white'>
-              Place in {scannedItem.binType} Bin
-            </Text>
-          </View>
-
-          <View className='mb-6 rounded-lg bg-white p-4 shadow-sm'>
-            <Text className='text-base leading-relaxed text-gray-600'>
-              {scannedItem.description}
-            </Text>
-          </View>
-
-          <View className='rounded-lg bg-white p-4 shadow-sm'>
-            <View className='mb-3 flex-row items-center'>
-              <Info size={20} color='#4b5563' />
-              <Text className='ml-2 text-lg font-semibold text-gray-800'>
-                Recycling Tips
-              </Text>
-            </View>
-            {scannedItem.recyclingTips.map((tip, index) => (
-              <View key={index} className='mb-2 flex-row items-center'>
-                <View className='mr-2 h-2 w-2 rounded-full bg-green-500' />
-                <Text className='text-gray-600'>{tip}</Text>
+          {scannedItem && (
+            <>
+              <View className='mt-4 mb-4 flex-row items-center justify-between'>
+                <Text className='text-2xl font-bold text-gray-800'>
+                  {scannedItem.name}
+                </Text>
               </View>
-            ))}
-          </View>
 
-          <View className='mt-6 flex-row justify-between'>
-            <TouchableOpacity
-              onPress={handleScanAnotherPhoto}
-              className='mb-6 flex-1 mr-2 flex-row items-center justify-center rounded-lg bg-blue-500 p-4'
-            >
-              <CameraIcon size={20} color='white' />
-              <Text className='ml-2 font-semibold text-white'>
-                Scan Another Photo
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleRemovePhoto}
-              className='mb-6 flex-1 ml-2 flex-row items-center justify-center rounded-lg bg-red-500 p-4'
-            >
-              <Trash2 size={20} color='white' />
-              <Text className='ml-2 font-semibold text-white'>
-                Remove Photo
-              </Text>
-            </TouchableOpacity>
-          </View>
+              <View
+                className='mb-6 flex-row items-center rounded-lg p-4'
+                style={{ backgroundColor: scannedItem.colour }}
+                //style={{ backgroundColor: 'black' }}
+              >
+                <RecycleIcon size={24} color='white' />
+                <Text className='ml-2 font-semibold text-white'>
+                  Place in the {scannedItem.colour} bin
+                </Text>
+              </View>
+
+              <View className='mb-6 rounded-lg bg-white p-4 shadow-sm'>
+                <Text className='text-base leading-relaxed text-gray-600'>
+                  {scannedItem.description}
+                </Text>
+              </View>
+
+              <View className='rounded-lg bg-white p-4 shadow-sm'>
+                <View className='mb-3 flex-row items-center'>
+                  <Info size={20} color='#4b5563' />
+                  <Text className='ml-2 text-lg font-semibold text-gray-800'>
+                    Recycling Tips
+                  </Text>
+                </View>
+                {scannedItem.tips.map((tip: string, index: number) => (
+                  <View key={index} className='mb-2 flex-row items-center'>
+                    <View className='mr-2 h-2 w-2 rounded-full bg-green-500' />
+                    <Text className='text-gray-600'>{tip}</Text>
+                  </View>
+                ))}
+              </View>
+
+              <View className='mt-6 flex-row justify-between'>
+                <TouchableOpacity
+                  onPress={handleScanAnotherPhoto}
+                  className='mb-6 flex-1 mr-2 flex-row items-center justify-center rounded-lg bg-blue-500 p-4'
+                >
+                  <CameraIcon size={20} color='white' />
+                  <Text className='ml-2 font-semibold text-white'>
+                    Scan Another Photo
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleRemovePhoto}
+                  className='mb-6 flex-1 ml-2 flex-row items-center justify-center rounded-lg bg-red-500 p-4'
+                >
+                  <Trash2 size={20} color='white' />
+                  <Text className='ml-2 font-semibold text-white'>
+                    Remove Photo
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
         </BottomSheetView>
       </BottomSheetModal>
       <CameraView
