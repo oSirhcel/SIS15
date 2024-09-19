@@ -41,7 +41,7 @@ const BottomSheetModal = ({
 }) => {
   const combinedSnapPoints = useMemo(() => {
     // Vaul uses different snap points format
-    return convertSnapPoints(snapPoints ?? []);
+    return convertSnapPoints(snapPoints || []);
   }, [snapPoints]);
 
   return (

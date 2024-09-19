@@ -16,5 +16,3 @@ export const NAV_THEME = {
     text: 'hsl(0 0% 98%)', // foreground
   },
 };
-
-export const DRAWER_SNAP_POINTS = ['25%', '75%', '50%', '90%'];
