@@ -58,9 +58,8 @@ def get_user_history():
                 'classification': item.classification,
                 'image': item.image,
                 'type': item.type,
-                'tips': json.loads(item.tips) if item.tips else [],
-                'date': item.date.isoformat() if item.date else None,
-                'colour': item.colour,
+                'tips': item.tips,
+                'date': item.date.isoformat() if item.date else None
             }
             items_list.append(item_data)
         return jsonify({
@@ -95,17 +94,16 @@ def process_image():
             "id": '1',
             "userId": '1',
             "name": 'Plastic Water Bottle',
-            "type": 'recyclable',  # Assuming you have a classification model
+            "type": 'Organic Waste',
             "description":
-                'Plastic water bottles are recyclable and should be placed in the recycling bin. Please make sure to empty and rinse the bottle before recycling.',
+              'Plastic water bottles are recyclable and should be placed in the recycling bin. Please make sure to empty and rinse the bottle before recycling.',
             "tips": [
-                'Remove the cap and recycle separately',
-                'Crush the bottle to save space',
-                'Check for recycling symbol (#1 PET or #2 HDPE)',
+              'Remove the cap and recycle separately',
+              'Crush the bottle to save space',
+              'Check for recycling symbol (#1 PET or #2 HDPE)',
             ],
             "date": '2021-05-01T12:00:00.000Z',
-            "colour": "blue"
-        }
+          }
         ), 200
 
     except Exception as e:

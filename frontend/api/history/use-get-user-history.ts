@@ -1,13 +1,9 @@
-import type { GetHistoryResponse } from '@/types/types';
+import type { GetHistoryResponse } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 
-//Development URL
-//const url = 'https://37rq6tqm-5000.aue.devtunnels.ms';
-const url = 'https://t9bh2v5k-5000.aue.devtunnels.ms';
+const url = process.env.EXPO_PUBLIC_API_URL;
 
 export const useGetUserHistory = (userId: string) => {
-  console.log(`sent useGetUserHistory to '${url}/history?userId=${userId}'`)
-
   const query = useQuery({
     // The query key is used to generate the cache key for the data
     queryKey: ['history', userId],
@@ -18,8 +14,6 @@ export const useGetUserHistory = (userId: string) => {
           'Content-Type': 'application/json',
         },
       });
-
-      console.log(response.ok);
 
       if (!response.ok) {
         throw new Error('Network response was not ok');
