@@ -1,4 +1,4 @@
-import type { ScanItemRequest, ScannedItemType } from '@/api/types';
+import type { ScanItemRequest, ScannedItemType } from '@/types/types';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 
 //Forwarded Backend URL
