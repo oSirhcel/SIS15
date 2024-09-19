@@ -1,41 +1,56 @@
 # Software Information Studio Team 15
 
-## Group Members
+### Group Members
 
 | Name | Student Number |
 | --- | --- |
 | Christopher Le | 13915285 |
-| Cameron Merrick |  |
+| Cameron Merrick | 24575007 |
 | Ethan Burgess |  |
 | Ramon Tovar |  |
 | Kuan Wang |  |
 | Zheyu Huang |  |
 
 
-## Installing Dependencies
+### Dependencies
+- [Bun](https://bun.sh/docs/installation)
 
-### Frontend
-[Bun Docs](https://bun.sh/docs/installation)
+### Testing
 
-## Running Instructions
-
-Enter `Ctr + C` to safely exit front or back end services.
-
-### Front End
-TODO
-
+**Running the app:**
 ```bash
 cd frontend
+bun install
+
+# Running on Android:
+bun run android
+
+# Running on IOS:
+bun run ios
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-### Backend
-TODO
-``` bash
+**Running the API:**
+```bash
 cd backend
+python -m venv venv
+source venv/bin/activate
+
+# Install dependencies using pip:
+pip install -r requirements.txt
+
+# Create and edit .env template
+cp .env.example .env
+nano .env
+
+# Execute app.py
+python app.py
 ```
 
-#### Docker
-
-TODO
+**Microsoft Devtunnel Setup**
+- It is also recommended to setup `devtunnel` to access the API from your device
+- https://learn.microsoft.com/en-us/azure/developer/dev-tunnels/get-started
+```bash
+devtunnel user login --github
+devtunnel host -p 5000 --allow-anonymous
+```
+- Then change the hardcoded URL in `frontend/api/history/use-get-user-history.ts` and `frontend/api/scan/use-scan-item.ts`.
