@@ -19,7 +19,7 @@ import {
   Image as ImageIcon,
 } from 'lucide-react-native';
 import { useSharedValue } from 'react-native-reanimated';
-import { ScannedItemType } from '@/api/types';
+import { ScannedItemType } from '@/types/types';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/lib/useColourScheme';
 import { useGetUserHistory } from '@/api/history/use-get-user-history';

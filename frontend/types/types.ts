@@ -9,8 +9,10 @@ export type ScannedItemType = {
   type: Waste;
   tips: string[];
   date: Date;
+  colour: Bin;
 };
 
+export type Bin = 'red' | 'yellow' | 'blue';
 export type Waste = 'recyclable' | 'biodegradable' | 'trash';
 
 export type User = {

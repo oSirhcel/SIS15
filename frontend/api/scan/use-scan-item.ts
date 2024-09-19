@@ -1,8 +1,8 @@
-import type { ScanItemRequest, ScannedItemType } from '@/api/types';
+import type { ScanItemRequest, ScannedItemType } from '@/types/types';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 
 //Forwarded Backend URL
-const url = 'https://37rq6tqm-5000.aue.devtunnels.ms';
+const url = 'https://t9bh2v5k-5000.aue.devtunnels.ms';
 
 export const useScanItem = () => {
   const queryClient = useQueryClient();
@@ -10,7 +10,7 @@ export const useScanItem = () => {
   const mutation = useMutation<ScannedItemType, Error, ScanItemRequest>({
     mutationFn: async (json) => {
       if (json.img_base64) {
-        console.log(json.img_base64.length);
+        console.log(`Base64 length: ${json.img_base64.length}`);
       }
       const response = await fetch(`${url}/scan`, {
         method: 'POST',
