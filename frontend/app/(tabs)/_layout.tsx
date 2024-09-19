@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
-
-import { CameraIcon, HomeIcon, Clock4Icon } from '@/lib/icons';
+import { HomeIcon } from '@/lib/icons/HomeIcon';
+import { CameraIcon } from '@/lib/icons/CameraIcon';
+import { Clock4Icon } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (
