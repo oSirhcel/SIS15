@@ -19,36 +19,10 @@ import {
   Image as ImageIcon,
 } from 'lucide-react-native';
 import { useSharedValue } from 'react-native-reanimated';
-import { ScannedItemType } from './types';
+import { ScannedItemType } from '@/api/types';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/lib/useColourScheme';
-
-const mockupData: ScannedItemType[] = [
-  {
-    id: '1',
-    title: 'Plastic Water Bottle',
-    description: 'Empty water bottle',
-    date: '2024-01-01',
-    type: 'recyclable',
-    imageUri: 'path/to/image',
-  },
-  {
-    id: '2',
-    title: 'Banana Peel',
-    description: 'Biodegradable waste',
-    date: '2024-01-10',
-    type: 'biodegradable',
-    imageUri: 'path/to/image',
-  },
-  {
-    id: '3',
-    title: 'Used Paper Towel',
-    description: 'Non-recyclable waste',
-    date: '2024-12-31',
-    type: 'trash',
-    imageUri: 'path/to/image',
-  },
-];
+import { useGetUserHistory } from '@/api/history/use-get-user-history';
 
 const getIconAndColor = (type: 'recyclable' | 'biodegradable' | 'trash') => {
   switch (type) {
@@ -102,9 +76,9 @@ const ScannedItem = ({
         <Icon size={24} color='white' />
       </View>
       <View className='flex-1'>
-        <Text className='text-lg font-semibold'>{item.title}</Text>
+        <Text className='text-lg font-semibold'>{item.name}</Text>
         <Text className='text-sm text-gray-600'>{item.description}</Text>
-        <Text className='mt-1 text-xs text-gray-400'>{item.date}</Text>
+        <Text className='mt-1 text-xs text-gray-400'>{item.date.toLocaleString()}</Text>
       </View>
       <View className={cn('h-3 w-3 rounded-full', bgColor)} />
     </TouchableOpacity>
@@ -135,8 +109,18 @@ const CallToActionButton = ({ onPress }: { onPress: () => void }) => {
 };
 
 export default function HistoryTab() {
+  // Fetch the user's scan history from the API, temporarily using a mock user ID
+  // React Query has a built-in cache, and states like 'isLoading', 'isError', and 'isSuccess'
+  //!!: See https://tanstack.com/query/latest/docs/framework/react/overview
+  const historyQuery = useGetUserHistory('1');
+
+  //TODO: Implement loading states and error handling
+  const historyItems = historyQuery.data?.items ?? [];
+
+  console.log(historyItems);
+
   const [scannedItems, setScannedItems] = useState<ScannedItemType[]>(
-    mockupData,
+    historyItems,
   );
   const [selectedItem, setSelectedItem] = useState<ScannedItemType | null>(null);
   const [isOpen, setIsOpen] = React.useState(false);
@@ -217,9 +201,9 @@ export default function HistoryTab() {
         backgroundStyle={{ backgroundColor: '#f3f4f6' }}
       >
         <BottomSheetView className='flex-1 px-4 pb-6 pt-2'>
-          {selectedItem && selectedItem.imageUri && (
+          {selectedItem && selectedItem.image && (
             <Image
-              source={{ uri: selectedItem.imageUri }}
+              source={{ uri: selectedItem.image }}
               style={{ width: '100%', height: 300 }}
               contentFit='contain'
             />
@@ -228,7 +212,7 @@ export default function HistoryTab() {
             <>
               <View className='mt-4 mb-4 flex-row items-center justify-between'>
                 <Text className='text-2xl font-bold text-gray-800'>
-                  {selectedItem.title}
+                  {selectedItem.name}
                 </Text>
               </View>
 
@@ -252,19 +236,12 @@ export default function HistoryTab() {
                     Recycling Tips
                   </Text>
                 </View>
-                {/* Replace with actual recycling tips based on item type */}
-                <View className='mb-2 flex-row items-center'>
-                  <View className='mr-2 h-2 w-2 rounded-full bg-green-500' />
-                  <Text className='text-gray-600'>
-                    Tip 1 based on {selectedItem.type}
-                  </Text>
-                </View>
-                <View className='mb-2 flex-row items-center'>
-                  <View className='mr-2 h-2 w-2 rounded-full bg-green-500' />
-                  <Text className='text-gray-600'>
-                    Tip 2 based on {selectedItem.type}
-                  </Text>
-                </View>
+                {selectedItem.tips.map((tip, index) => (
+                  <View key={index} className='mb-2 flex-row items-center'>
+                    <View className='mr-2 h-2 w-2 rounded-full bg-green-500' />
+                    <Text className='text-gray-600'>{tip}</Text>
+                  </View>
+                ))}
               </View>
 
               <View className='mt-6 flex-row justify-between'>
