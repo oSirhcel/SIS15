@@ -11,7 +11,7 @@ export type ScannedItem = {
   date: Date;
 };
 
-export type WasteType = 'General Waste' | 'Recycling' | 'Organic Waste';
+export type WasteType = 'General Waste' | 'Recycling' | 'Organic Waste' | 'metal';
 
 export type User = {
   id: string;

@@ -27,6 +27,13 @@ export function getIconAndColor(type: WasteType) {
         color: 'Green',
         bgColor: 'bg-green-500',
       };
+    
+    case 'metal':
+      return {
+        icon: LeafIcon,
+        color: 'Green',
+        bgColor: 'bg-green-500',
+      };
 
     default:
       return {
