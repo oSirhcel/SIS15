@@ -2,7 +2,7 @@ import type { ScanItemRequest, ScannedItem } from '@/types';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 
 //const url = process.env.EXPO_PUBLIC_API_URL;
-const url = "https://qsbzflbk.aue.devtunnels.ms:5001";
+const url = "https://8c8xs0qn.aue.devtunnels.ms:5001";
 
 export const useScanItem = () => {
   const queryClient = useQueryClient();

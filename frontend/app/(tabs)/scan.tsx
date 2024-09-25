@@ -183,6 +183,7 @@ export default function Tab() {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      
       <BottomSheetModal
         ref={bottomSheetModalRef}
         index={1}
@@ -196,6 +197,7 @@ export default function Tab() {
         )}
         backgroundStyle={{ backgroundColor: '#f3f4f6' }}
       >
+      
         {scannedItem && (
           <ScannedItemDrawer
             item={scannedItem}

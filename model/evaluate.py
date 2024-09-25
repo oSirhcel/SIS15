@@ -1,3 +1,4 @@
+
 import torch
 import clip
 import torch.nn.functional as F
@@ -18,55 +19,52 @@ def preprocess_image(image_path, image_size=224):
         transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711)),
     ])
     image = Image.open(image_path).convert('RGB')
-    return preprocess(image).unsqueeze(0)  # 返回的是一个 4D tensor
+    return preprocess(image).unsqueeze(0)
 
 
 # load model
-def load_model(model_path, num_classes):
-
-    checkpoint = torch.load(model_path)
+def load_model(model_path):
 
     model, _ = clip.load("ViT-B/32", device=device, jit=False)
 
-    # define and load classifier
-    classifier = torch.nn.Linear(512, num_classes)
-    classifier.load_state_dict(checkpoint['classifier_state_dict'])
 
+    checkpoint = torch.load(model_path, map_location=device, weights_only=True)
+    model.load_state_dict(checkpoint['clip_model_state_dict'])
 
     model.to(device)
-    classifier.to(device)
-
-
     model.eval()
-    classifier.eval()
+    return model
 
-    return model, classifier
 
 
 # classification
-def classify_image(model, classifier, image_tensor, classes):
-    # img_emb
-    with torch.no_grad():
-        image_encoding = model.encode_image(image_tensor.to(device))
-        image_encoding = F.normalize(image_encoding)  # 标准化
+def classify_image(model, image_tensor, classes):
 
-    # predict
-    with torch.no_grad():
-        output = classifier(image_encoding)
-        predicted_class = torch.argmax(output, dim=1).item()
+    text_inputs = torch.cat([clip.tokenize(f"a photo of a {c}") for c in classes]).to(device)
 
-    # result
+
+    with torch.no_grad():
+        image_encoding = model.encode_image(image_tensor)
+        image_encoding = F.normalize(image_encoding)
+
+        text_encoding = model.encode_text(text_inputs)
+        text_encoding = F.normalize(text_encoding)
+
+
+        similarity = (100.0 * image_encoding @ text_encoding.T).softmax(dim=-1)
+
+
+    predicted_class = similarity.argmax(dim=-1).item()
+
     return classes[predicted_class]
 
-def get_prediction(image_dir, model_path):
-    class_names = ["battery", "biological", "brown-glass", "cardboard", "clothes", "green-glass", "metal", "paper", "plastic", "shoes", "trash", "white-glass"]
-    model, classifier = load_model(model_path, 12)
+def get_prediction(image_path, model_path):
+    model = load_model(model_path)
+
+    image_tensor = preprocess_image(image_path)
 
 
-    image_tensor = preprocess_image(image_dir)
-
-
-    predicted_class = classify_image(model, classifier, image_tensor, class_names)
+    predicted_class = classify_image(model,  image_tensor, ["battery", "biological", "brown-glass", "cardboard", "clothes", "green-glass", "metal", "paper", "plastic", "shoes", "trash", "white-glass"])
     return predicted_class
 
 def main():
@@ -74,18 +72,18 @@ def main():
     parser = argparse.ArgumentParser(description="Evaluate a trained model on new images.")
     parser.add_argument('--model_path', type=str, required=True, help='Path to the trained model file')
     parser.add_argument('--image_path', type=str, required=True, help='Path to the image file to classify')
-    parser.add_argument('--num_classes', type=int, required=True, help='Number of classes in the classification task')
+    # parser.add_argument('--num_classes', type=int, required=True, help='Number of classes in the classification task')
     parser.add_argument('--class_names', type=str, nargs='+', required=True, help='List of class names for the dataset')
     args = parser.parse_args()
 
 
-    model, classifier = load_model(args.model_path, args.num_classes)
-
+    # model, classifier = load_model(args.model_path, args.num_classes)
+    model = load_model(args.model_path)
 
     image_tensor = preprocess_image(args.image_path)
 
 
-    predicted_class = classify_image(model, classifier, image_tensor, args.class_names)
+    predicted_class = classify_image(model,  image_tensor, args.class_names)
 
 
     print(f"Predicted class for the image: {predicted_class}")

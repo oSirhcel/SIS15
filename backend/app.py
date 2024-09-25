@@ -8,6 +8,7 @@ import time
 import io
 import sys
 import os
+from datetime import datetime
 
 # Add the parent directory of "model" to the system path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
@@ -96,11 +97,8 @@ def process_image():
         image_dir = convert_base64_jpg(base64_string)
         time.sleep(2)
         # This is where you would process the image with your model
-        classification = get_prediction(image_dir, "/Users/ethanburgess/Desktop/UTS/sem22024/sis/SIS15/models/model1")
-        print(classification)
-        # Placeholder response
-        # ScannedItemType: frontend/types/types.ts
-        # For now no image is sent, and taken image is reused in front end
+        classification = get_prediction(image_dir, "/Users/ethanburgess/Downloads/best.pth")
+
         return jsonify({
             "id": '1',
             "userId": '1',
@@ -113,7 +111,7 @@ def process_image():
               'Crush the bottle to save space',
               'Check for recycling symbol (#1 PET or #2 HDPE)',
             ],
-            "date": '2021-05-01T12:00:00.000Z',
+            "date": f'{datetime.now()}',
           }
         ), 200
 
