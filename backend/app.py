@@ -1,7 +1,5 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-#from config import Config
-#from models import db, User, ScannedItem
 import base64
 from PIL import Image
 import time
@@ -9,77 +7,16 @@ import io
 import sys
 import os
 from datetime import datetime
+from openAIAPI import open_ai_response
+import uuid
+from classificationMapping import map_class
+
+app = Flask(__name__)
+CORS(app)
 
 # Add the parent directory of "model" to the system path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 from model.evaluate import get_prediction
-import uuid
-
-app = Flask(__name__)
-CORS(app)
-"""
-app.config.from_object(Config)
-db.init_app(app)
-
-# Create tables if they don't exist
-with app.app_context():
-    db.create_all()
-
-@app.route('/', methods=['GET'])
-def get_all_users():
-    try:
-        users = db.session.get(User)
-        user_list = []
-        for user in users:
-            user_data = {
-                'id': user.id,
-                'username': user.username,
-                'email': user.email
-            }
-            user_list.append(user_data)
-          
-        return jsonify({'users': user_list}), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-    
-@app.route('/history', methods=['GET'])
-def get_user_history():
-    try:
-        user_id = request.args.get('userId')
-        if not user_id:
-            return jsonify({'error': 'userId is required'}), 400
-        
-        # Check if the user exists
-        user = db.session.get(User, user_id)
-        if not user:
-            return jsonify({'error': 'User not found'}), 404
-        
-        # Fetch all scanned items for the user
-        scanned_items = db.session.query(ScannedItem).filter_by(user_id=user_id).all()
-        
-
-        # ScannedItemType: frontend/types/types.ts
-        items_list = []
-        for item in scanned_items:
-            item_data = {
-                'id': item.id,
-                'name': item.name,
-                'description': item.description,
-                'classification': item.classification,
-                'image': item.image,
-                'type': item.type,
-                'tips': item.tips,
-                'date': item.date.isoformat() if item.date else None
-            }
-            items_list.append(item_data)
-        return jsonify({
-            'userId': user_id,
-            'items': items_list
-        }), 200
-
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-"""
 
 @app.route('/scan', methods=['POST'])
 def process_image():
@@ -88,35 +25,50 @@ def process_image():
 
     if not base64_string:
         return jsonify({'error': 'No image data provided'}), 400
+    
     try:
-        # Decode the base64 string to bytes
-        image_bytes = base64.b64decode(base64_string)
-
-        # Convert bytes to PIL Image
-        #image = Image.open(io.BytesIO(image_bytes))
+        # Convert base64 string to an image file
         image_dir = convert_base64_jpg(base64_string)
-        time.sleep(2)
-        # This is where you would process the image with your model
+        
+        # Process the image and get classification
         classification = get_prediction(image_dir, "/Users/ethanburgess/Downloads/best.pth")
-
-        return jsonify({
+        print(f"Classification: {classification}")
+        
+        # Get suggestions from OpenAI based on classification
+        suggestions = open_ai_response(classification)
+        print(f"Suggestions: {suggestions}")
+        recycle_suggestion = suggestions.get("recycle_suggestion", "No recycle suggestion available")
+        reuse_suggestion = suggestions.get("reuse_suggestion", "No reuse suggestion available")
+        
+        # Build the response
+        response_data = {
             "id": '1',
             "userId": '1',
-            "name": f'{classification}',
-            "type": f'{classification}',
-            "description":
-              'Plastic water bottles are recyclable and should be placed in the recycling bin. Please make sure to empty and rinse the bottle before recycling.',
-            "tips": [
-              'Remove the cap and recycle separately',
-              'Crush the bottle to save space',
-              'Check for recycling symbol (#1 PET or #2 HDPE)',
-            ],
+            "type": map_class(classification),
+            "suggestions": {
+                "recycle": recycle_suggestion,
+                "reuse": reuse_suggestion,
+            },
+            "companies": format_companies(suggestions),
             "date": f'{datetime.now()}',
-          }
-        ), 200
+        }
+        
+        return jsonify(response_data), 200
 
     except Exception as e:
+        print(f"Error: {str(e)}")
         return jsonify({'error': f'Error processing image: {str(e)}'}), 500
+
+
+def format_companies(suggestions):
+    # Assuming suggestions["companies"] is a list of dictionaries with "name" and "website"
+    companies_list = []
+    for company in suggestions["companies"]:
+        companies_list.append({
+            "name": company["name"],
+            "website": company["website"]
+        })
+    return companies_list
 
 
 def convert_base64_jpg(base64_string):
@@ -125,13 +77,16 @@ def convert_base64_jpg(base64_string):
         base64_string = base64_string.split("base64,")[1]
 
     # Decode the base64 string
-    image_data = base64.b64decode(base64_string)
+    try:
+        image_data = base64.b64decode(base64_string)
+    except Exception as e:
+        raise ValueError(f"Invalid base64 data: {e}")
+
     # Generate a unique image ID
     image_id = uuid.uuid1()
 
     # Path where the image will be saved
     temp_img_dir = f"/Users/ethanburgess/Desktop/UTS/sem22024/sis/SIS15/tempFiles/{image_id}.jpg"
-
     print(f"Saving image to: {temp_img_dir}")
 
     # Save the decoded image to a file
@@ -139,6 +94,7 @@ def convert_base64_jpg(base64_string):
         file.write(image_data)
 
     return temp_img_dir  # Return the file path
+
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5001, debug=True)
