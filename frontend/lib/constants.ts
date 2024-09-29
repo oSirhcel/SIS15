@@ -17,4 +17,4 @@ export const NAV_THEME = {
   },
 };
 
-export const DRAWER_SNAP_POINTS = ['25%', '75%', '50%', '90%'];
+export const DRAWER_SNAP_POINTS = ['25%', '60%'];

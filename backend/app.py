@@ -34,6 +34,7 @@ def process_image():
         image_dir = convert_base64_jpg(base64_string)
         
         # Process the image and get classification
+        # Needs to be changed in production
         classification = get_prediction(image_dir, "/Users/ethanburgess/Downloads/best.pth")
         print(f"Classification: {classification}")
         
@@ -89,6 +90,7 @@ def convert_base64_jpg(base64_string):
     image_id = uuid.uuid1()
 
     # Path where the image will be saved
+    # Needs to be changed in production
     temp_img_dir = f"/Users/ethanburgess/Desktop/UTS/sem22024/sis/SIS15/tempFiles/{image_id}.jpg"
     print(f"Saving image to: {temp_img_dir}")
 
