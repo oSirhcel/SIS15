@@ -1,6 +1,6 @@
 from openai import OpenAI
 import json
-client = OpenAI(api_key="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")
+client = OpenAI(api_key="dummy key")
 
 
 def open_ai_response(waste_classification):
