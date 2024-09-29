@@ -6,7 +6,7 @@
 | --------------- | -------------- |
 | Christopher Le  | 13915285       |
 | Cameron Merrick | 24575007       |
-| Ethan Burgess   |                |
+| Ethan Burgess   | 13934500       |
 | Ramon Tovar     |                |
 | Kuan Wang       |                |
 | Zheyu Huang     |                |
@@ -25,17 +25,21 @@ bun install
 ```
 
 # Setup environment variables
+
 create a .env file and copy the contents of .env.example, replacing the example variables with proper values:
+
 ```# .env
 EXPO_PUBLIC_API_URL="YOUR_TUNNELED_URL_GOES_HERE"
 ```
 
 # Running on Android:
+
 ```
 bun run android
 ```
 
 # Running on IOS:
+
 ```
 bun run ios
 ```
@@ -71,3 +75,9 @@ devtunnel host -p 5000 --allow-anonymous
 ```
 
 - Then change the EXPO_PUBLIC_API_URL in the frontend .env
+
+**OpenAI access key**
+
+- Refer to our project discord text channel: apis-datasets-sdk find the pinned message for the secret key value
+- Directory: backend/openAIAPI.py Variable: client = OpenAI(api_key="dummy key") (line 3)
+- Replace 'dummy key' with the secret key found in discord

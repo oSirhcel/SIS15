@@ -2,6 +2,8 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import base64
 from PIL import Image
+#from config import Config
+#from models import db, User, ScannedItem
 import time
 import io
 import sys
@@ -17,6 +19,7 @@ CORS(app)
 # Add the parent directory of "model" to the system path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 from model.evaluate import get_prediction
+
 
 @app.route('/scan', methods=['POST'])
 def process_image():
