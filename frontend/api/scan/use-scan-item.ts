@@ -10,7 +10,7 @@ export const useScanItem = () => {
 
   const mutation = useMutation<ScannedItem, Error, ScanItemRequest>({
     mutationFn: async (json) => {
-      const response = await fetch(`${url}/mockScan`, {
+      const response = await fetch(`${url}/scan`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
