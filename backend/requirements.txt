@@ -13,3 +13,7 @@ python-dotenv==1.0.1
 SQLAlchemy==2.0.35
 typing_extensions==4.12.2
 Werkzeug==3.0.4
+openai==1.50.2
+pytorch==2.4.1
+clip==0.2.0
+torchvision==0.19.1
