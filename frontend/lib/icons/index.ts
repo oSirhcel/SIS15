@@ -11,6 +11,7 @@ import {
   ImageIcon,
   PencilIcon,
   XIcon,
+  ArrowLeftIcon,
 } from 'lucide-react-native';
 
 import { iconWithClassName } from '@/lib/icons/iconWithClassName';
@@ -29,6 +30,7 @@ iconWithClassName(ChevronDownIcon);
 iconWithClassName(ImageIcon);
 iconWithClassName(PencilIcon);
 iconWithClassName(XIcon);
+iconWithClassName(ArrowLeftIcon);
 
 export {
   CameraIcon,
@@ -43,4 +45,5 @@ export {
   ImageIcon,
   PencilIcon,
   XIcon,
+  ArrowLeftIcon,
 };

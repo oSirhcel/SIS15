@@ -4,29 +4,18 @@ import { cn, getIconAndColor } from '@/lib/utils';
 import { InfoIcon } from '@/lib/icons';
 import type { ScannedItem } from '@/types';
 
-import { Button } from '../ui/button';
-
 type Props = {
   item: ScannedItem;
-  handleClose: () => void;
 };
 
-export const ScannedItemDrawer = ({ item, handleClose }: Props) => {
+export const ScannedItemDrawer = ({ item }: Props) => {
   const { icon: Icon, color, bgColor } = getIconAndColor(item.type);
 
   return (
     <BottomSheetView className='flex-1 px-4 pb-6'>
       <View className='mb-4 flex-row items-center justify-between'>
         <Text className='text-2xl font-bold text-gray-800'>{item.type}</Text>
-        <Button
-          variant={'ghost'}
-          className='active:bg-slate-500/10'
-          onPress={handleClose}
-        >
-          <Text className='text-blue-500'>Close</Text>
-        </Button>
       </View>
-
       <View
         className={cn('mb-6 flex-row items-center rounded-lg p-4', bgColor)}
       >
@@ -78,7 +67,7 @@ export const ScannedItemDrawer = ({ item, handleClose }: Props) => {
 export const ScannedItemDrawerSkeleton = () => {
   return (
     <BottomSheetView className='flex-1 px-4 pb-6'>
-      <View className='mb-4flex-row items-center justify-between'>
+      <View className='mb-4 flex-row items-center justify-between'>
         <View className='h-8 w-32 animate-pulse rounded-md bg-gray-200' />
       </View>
 

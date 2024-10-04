@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { type CameraType, CameraView, useCameraPermissions } from 'expo-camera';
 import { Image } from 'expo-image';
-import { Repeat2Icon } from '@/lib/icons';
+import { CameraIcon, ImageIcon, Repeat2Icon, ArrowLeftIcon } from '@/lib/icons';
 import {
   usePermissions as useMediaPermissions,
   getAssetsAsync,
@@ -24,6 +24,10 @@ import {
   ScannedItemDrawerSkeleton,
 } from '@/components/scan/scanned-item-drawer';
 import { DRAWER_SNAP_POINTS } from '@/lib/constants';
+import {
+  BottomSheetBackdrop,
+  type BottomSheetBackdropProps,
+} from '@gorhom/bottom-sheet';
 
 export default function Tab() {
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
@@ -40,6 +44,17 @@ export default function Tab() {
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
   const snapPoints = useMemo(() => DRAWER_SNAP_POINTS, []);
+
+  const renderBackdrop = useCallback(
+    (props: BottomSheetBackdropProps) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={0}
+        appearsOnIndex={1}
+      />
+    ),
+    [],
+  );
 
   const handleOpenModal = useCallback(() => {
     bottomSheetModalRef.current?.present();
@@ -144,6 +159,7 @@ export default function Tab() {
     }
 
     setCurrentPhoto(result.assets[0].uri);
+    setScannedItem(undefined);
 
     if (!result.assets[0].base64) {
       console.error('Error: Image data is undefined');
@@ -185,8 +201,9 @@ export default function Tab() {
     <SafeAreaView style={{ flex: 1 }}>
       <BottomSheetModal
         ref={bottomSheetModalRef}
-        index={1}
+        index={0}
         snapPoints={snapPoints}
+        backdropComponent={renderBackdrop}
         handleComponent={() => (
           <BottomSheetHandle
             className='mt-2 bg-green-300'
@@ -194,39 +211,53 @@ export default function Tab() {
             animatedPosition={animatedPosition}
           />
         )}
+        enablePanDownToClose={false}
         backgroundStyle={{ backgroundColor: '#f3f4f6' }}
       >
-        {!!scannedItem && (
-          <ScannedItemDrawer
-            item={scannedItem}
-            handleClose={closeBottomSheet}
-          />
-        )}
-
+        {!!scannedItem && <ScannedItemDrawer item={scannedItem} />}
         {isPending && <ScannedItemDrawerSkeleton />}
       </BottomSheetModal>
+
+      {/* Consistent back button position */}
+      <View style={{ position: 'absolute', top: 92, left: 16, zIndex: 10 }}>
+        <Button
+          onPress={() => {
+            router.push('/');
+            closeBottomSheet();
+          }}
+          size={'icon'}
+          className='rounded-full p-8'
+        >
+          <ArrowLeftIcon className='text-primary-foreground' />
+        </Button>
+      </View>
+
       {currentPhoto ? (
-        <>
-          {/* //TODO: Styles */}
-          <Image
-            source={{ uri: currentPhoto }}
-            style={{
-              width: '100%',
-              height: '100%',
-            }}
-            contentFit='cover'
-          />
-          <View className='absolute bottom-0 left-0 right-0 h-24 bg-black'>
-            <View className='flex-1 flex-row items-center justify-between px-4'>
-              <Button onPress={handleScanAnotherPhoto} disabled={isPending}>
-                <Text>Reset</Text>
-              </Button>
-              <Button onPress={handleOpenModal}>
-                <Text>Info</Text>
-              </Button>
-            </View>
+        <Image
+          source={{ uri: currentPhoto }}
+          style={{
+            flex: 1,
+          }}
+        >
+          <View className='mb-32 flex-1 flex-row items-end justify-between px-4'>
+            <Button
+              onPress={pickImageFromLibrary}
+              size={'icon'}
+              className='rounded-full p-8'
+            >
+              <ImageIcon className='text-primary-foreground' />
+            </Button>
+            <Button
+              onPress={handleScanAnotherPhoto}
+              disabled={isPending}
+              size={'icon'}
+              className='rounded-full p-8'
+            >
+              <CameraIcon className='text-primary-foreground' />
+            </Button>
           </View>
-        </>
+          <View className='absolute bottom-0 left-0 right-0 h-24 bg-black' />
+        </Image>
       ) : (
         <CameraView
           ref={cameraRef}
@@ -237,11 +268,10 @@ export default function Tab() {
         >
           <View className='absolute bottom-0 left-0 right-0 h-24 bg-black'>
             <View className='flex-1 flex-row items-center justify-between px-4'>
-              <TouchableOpacity // Always render the TouchableOpacity
+              <TouchableOpacity
                 onPress={pickImageFromLibrary}
                 className='h-16 w-12 overflow-hidden rounded-md border-2 border-white'
               >
-                {/* Conditionally render the image if lastPhoto exists */}
                 {lastPhoto && (
                   <Image
                     source={{ uri: lastPhoto }}
