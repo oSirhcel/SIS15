@@ -12,14 +12,26 @@ from datetime import datetime
 from openAIAPI import open_ai_response
 import uuid
 from classificationMapping import map_class
+import pathlib
+import warnings
 
 app = Flask(__name__)
 CORS(app)
+MODEL = "best.pth" # Update this as necessary
 
 # Add the parent directory of "model" to the system path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 from model.evaluate import get_prediction
 
+# Adding a directory to store processed images
+processed_images_path = os.path.join(pathlib.Path(__file__).parent.resolve(), "images")
+if not os.path.isdir(processed_images_path):
+    os.mkdir(processed_images_path)
+
+# Creating a directory to contain the model
+model_path = os.path.join(pathlib.Path(__file__).parent.resolve(), "model")
+if not os.path.isdir(model_path):
+    os.mkdir(model_path)
 
 @app.route('/scan', methods=['POST'])
 def process_image():
@@ -35,7 +47,7 @@ def process_image():
         
         # Process the image and get classification
         # Needs to be changed in production
-        classification = get_prediction(image_dir, "/Users/ethanburgess/Downloads/best.pth")
+        classification = get_prediction(image_dir, os.path.join(model_path, f"{MODEL}"))
         print(f"Classification: {classification}")
         
         # Get suggestions from OpenAI based on classification
@@ -91,7 +103,7 @@ def convert_base64_jpg(base64_string):
 
     # Path where the image will be saved
     # Needs to be changed in production
-    temp_img_dir = f"/Users/ethanburgess/Desktop/UTS/sem22024/sis/SIS15/tempFiles/{image_id}.jpg"
+    temp_img_dir = os.path.join(processed_images_path, f"{image_id}.jpg")
     print(f"Saving image to: {temp_img_dir}")
 
     # Save the decoded image to a file
