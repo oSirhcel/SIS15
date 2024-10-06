@@ -1,6 +1,6 @@
-
 import torch
-import clip
+# import clip
+import open_clip
 import torch.nn.functional as F
 from PIL import Image
 import argparse
@@ -25,10 +25,11 @@ def preprocess_image(image_path, image_size=224):
 # load model
 def load_model(model_path):
 
-    model, _ = clip.load("ViT-B/32", device=device, jit=False)
+    model, _, preprocess = open_clip.create_model_and_transforms('ViT-B-32', pretrained='openai')
+    # model, _ = clip.load("ViT-B/32", device=device, jit=False)
 
 
-    checkpoint = torch.load(model_path, map_location=device, weights_only=True)
+    checkpoint = torch.load(model_path, map_location=device)
     model.load_state_dict(checkpoint['clip_model_state_dict'])
 
     model.to(device)
@@ -40,7 +41,7 @@ def load_model(model_path):
 # classification
 def classify_image(model, image_tensor, classes):
 
-    text_inputs = torch.cat([clip.tokenize(f"a photo of a {c}") for c in classes]).to(device)
+    text_inputs = torch.cat([open_clip.tokenize(f"a photo of a {c}") for c in classes]).to(device)
 
 
     with torch.no_grad():
