@@ -36,6 +36,9 @@ pip install -r requirements.txt
 # Setup environment variables
 cp .env.example .env
 
+# Download the classification model
+wget -P ./models https://github.com/HZYSDS/classification_part/raw/refs/heads/main/best.pth
+
 # Execute app.py
 python app.py
 ```
@@ -58,7 +61,7 @@ devtunnel user login --github # This will take you to login on GitHub
 and then generate a **tunneled URL**. Keep in mind that a new URL will be generated every time you start `Microsoft Devtunnel` and you will need to update your environment variables accordingly.
 
 ```bash
-devtunnel host -p 5001 --allow-anonymouso
+devtunnel host -p 5001 --allow-anonymous
 
 # It should generate a tunneled URL like: https://qw5dpd7j.aue.devtunnels.ms:5001"
 ```
