@@ -1,6 +1,7 @@
 from openai import OpenAI
 import json
-client = OpenAI(api_key="dummy key")
+from config import Config
+client = OpenAI(api_key=Config.OPENAI_KEY)
 
 
 def open_ai_response(waste_classification):
