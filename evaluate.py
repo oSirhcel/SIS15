@@ -18,7 +18,7 @@ def preprocess_image(image_path, image_size=224):
         transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711)),
     ])
     image = Image.open(image_path).convert('RGB')
-    return preprocess(image).unsqueeze(0)  # 返回的是一个 4D tensor
+    return preprocess(image).unsqueeze(0)  
 
 
 # load model
