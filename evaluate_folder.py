@@ -1,79 +1,61 @@
+import torch
+import clip
+import torch.nn.functional as F
+from PIL import Image
 import argparse
 import os
-import torch
-from torchvision import transforms
-from PIL import Image
-import torch.nn.functional as F
-import clip
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-
-def preprocess_image(image_path, image_size=224):
-    preprocess = transforms.Compose([
-        transforms.Resize((image_size, image_size)),
-        transforms.ToTensor(),
-        transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711)),
-    ])
+# Use the CLIP-provided preprocessing function for consistency
+def preprocess_image(image_path, preprocess):
     image = Image.open(image_path).convert('RGB')
     return preprocess(image).unsqueeze(0)
 
+# Load the CLIP model and classifier
+def load_model(model_path, num_classes):
+    checkpoint = torch.load(model_path)
+    model, preprocess = clip.load("ViT-B/32", device=device, jit=False)
 
-def load_model(model_path):
-    model, _ = clip.load("ViT-B/32", device=device, jit=False)
-    checkpoint = torch.load(model_path, map_location=device)
-    model.load_state_dict(checkpoint['clip_model_state_dict'])
+    # define and load classifier
+    classifier = torch.nn.Linear(512, num_classes)
+    classifier.load_state_dict(checkpoint['classifier_state_dict'])
+
     model.to(device)
+    classifier.to(device)
+
     model.eval()
-    return model
+    classifier.eval()
 
+    return model, classifier, preprocess
 
-def classify_image(model, image_tensor, classes):
-    text_inputs = torch.cat([clip.tokenize(f"a photo of a {c}") for c in classes]).to(device)
+# Classification function
+def classify_image(model, classifier, image_tensor, classes):
     with torch.no_grad():
-        image_encoding = model.encode_image(image_tensor)
-        image_encoding = F.normalize(image_encoding)
-        text_encoding = model.encode_text(text_inputs)
-        text_encoding = F.normalize(text_encoding)
-        similarity = (100.0 * image_encoding @ text_encoding.T).softmax(dim=-1)
-    predicted_class = similarity.argmax(dim=-1).item()
+        image_encoding = model.encode_image(image_tensor.to(device))
+        image_encoding = F.normalize(image_encoding)  # Normalize image encoding
+
+    with torch.no_grad():
+        output = classifier(image_encoding)
+        predicted_class = torch.argmax(output, dim=1).item()
+
     return classes[predicted_class]
 
-
-def evaluate_folder(folder_path, model, class_names):
-    correct = 0
-    total = 0
-    for image_filename in os.listdir(folder_path):
-        image_path = os.path.join(folder_path, image_filename)
-        if os.path.isfile(image_path) and (image_filename.endswith('.jpg') or image_filename.endswith('.png')):
-            image_tensor = preprocess_image(image_path)
-            predicted_class = classify_image(model, image_tensor, class_names)
-            true_class = os.path.basename(image_filename).split('_')[0]  # Assuming class is part of the file name
-
-            print(f"Processing {image_filename}")
-            print(f"Predicted: {predicted_class}, True: {true_class}")
-
-            total += 1
-            if predicted_class == true_class:
-                correct += 1
-
-    accuracy = 100 * correct / total if total > 0 else 0
-    print(f"\nFinal Accuracy: {accuracy:.2f}% (Correct: {correct}/{total})")
-
-
 def main():
-    parser = argparse.ArgumentParser(description="Evaluate a trained model on a folder of images.")
+    parser = argparse.ArgumentParser(description="Evaluate a trained model on new images.")
     parser.add_argument('--model_path', type=str, required=True, help='Path to the trained model file')
-    parser.add_argument('--folder_path', type=str, required=True, help='Path to the folder containing images')
+    parser.add_argument('--image_path', type=str, required=True, help='Path to the image file to classify')
+    parser.add_argument('--num_classes', type=int, required=True, help='Number of classes in the classification task')
     parser.add_argument('--class_names', type=str, nargs='+', required=True, help='List of class names for the dataset')
     args = parser.parse_args()
 
-    # Load model
-    model = load_model(args.model_path)
+    model, classifier, preprocess = load_model(args.model_path, args.num_classes)
 
-    # Evaluate all images in the folder
-    evaluate_folder(args.folder_path, model, args.class_names)
+    image_tensor = preprocess_image(args.image_path, preprocess)
 
+    predicted_class = classify_image(model, classifier, image_tensor, args.class_names)
+
+    print(f"Predicted class for the image: {predicted_class}")
 
 if __name__ == '__main__':
     main()
