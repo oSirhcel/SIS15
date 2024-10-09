@@ -14,7 +14,8 @@
 ## Dependencies and Setting Up
 
 - [Bun](https://bun.sh/docs/installation)
-- See further requirements in [requirements](backend\requirements.txt)
+- [Conda](https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html) (you can boostrap a `conda` installation using the minimal installer such as [Miniconda](https://docs.anaconda.com/miniconda/)
+- `best.pth` which is the trained model. This can be found [here](https://github.com/HZYSDS/classification_part). Once downloaded, place it into `SIS15/backend/model/` (create the `model` directory if it doesn't exist already).
 
 ### Frontend
 ```bash
@@ -24,29 +25,22 @@ bun install
 
 ### Backend
 ```bash
-cd backend
-python -m venv venv
+# Create a new virtual environment with python v3.10 and pip v24.2
+# and then install of the dependencies listed in environment.yaml
+cd model
+conda env create -f environment.yaml
 
-./venv/Scripts/Activate.ps1     # WINDOWS
-source venv/bin/activate        # UNIX
-
-# Install dependencies using pip:
-pip install -r requirements.txt
-
-# Setup environment variables
-cp .env.example .env
-
-# Download the classification model
-wget -P ./models https://github.com/HZYSDS/classification_part/raw/refs/heads/main/best.pth
+cd ../backend
+conda activate garbage
 
 # Execute app.py
 python app.py
 ```
 **OpenAI access key**
 
-- Refer to our project discord text channel: apis-datasets-sdk find the pinned message for the secret key value
-- Directory: backend/openAIAPI.py Variable: client = OpenAI(api_key="dummy key") (line 3)
-- Replace 'dummy key' with the secret key found in discord
+- Refer to our project discord text channel: `apis-datasets-sdk` find the pinned message for the secret key value
+- Directory: `backend/openAIAPI.py`; Variable: `client = OpenAI(api_key="dummy key")` (line 3)
+- Replace `dummy key` with the secret key found in discord
 
 ### Setup environment variables
 
