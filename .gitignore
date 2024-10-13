@@ -2,3 +2,4 @@ sisModel/
 model/datasets/
 models/model1
 tempFiles/
+.DS_Store
