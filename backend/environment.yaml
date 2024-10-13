@@ -1,0 +1,13 @@
+name: garbage
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.10
+  - flask
+  - flask_cors
+  - pillow
+  - openai
+  - python-dotenv
+  - pytorch
+  - conda-forge::open-clip-torch

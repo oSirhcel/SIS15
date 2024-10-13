@@ -15,7 +15,7 @@
 
 - [Bun](https://bun.sh/docs/installation)
 - [Conda](https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html) (you can boostrap a `conda` installation using the minimal installer such as [Miniconda](https://docs.anaconda.com/miniconda/)
-- `best.pth` which is the trained model. This can be found [here](https://github.com/HZYSDS/classification_part). Once downloaded, place it into `SIS15/backend/model/` (create the `model` directory if it doesn't exist already).
+- `best.pth` which is the trained model. This can be found [here](https://github.com/HZYSDS/classification_part). Once downloaded, place it into `SIS15/backend/app/model/` or set the default model path in `SIS15/backend/.env`
 
 ### Frontend
 ```bash
@@ -25,16 +25,14 @@ bun install
 
 ### Backend
 ```bash
-# Create a new virtual environment with python v3.10 and pip v24.2
-# and then install of the dependencies listed in environment.yaml
-cd model
-conda env create -f environment.yaml
+cd backend
 
-cd ../backend
+# Create a new Python v3.10 environment and install dependencies
+conda env create -f environment.yaml
 conda activate garbage
 
-# Execute app.py
-python app.py
+# Run the development server
+python app
 ```
 **OpenAI access key**
 
@@ -80,7 +78,7 @@ bun expo start -c
 Run the following code snippet in the command line while in the `backend/` directory:
 ```bash
 cd backend
-python app.py
+python app
 ```
 
 And then in another terminal instance, spin up your `Microsoft Devtunnel` with (remember to update your environment variables in `frontend/.env` with the newly generated URL):
