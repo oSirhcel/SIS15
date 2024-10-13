@@ -8,6 +8,8 @@ from torchvision import transforms
 import os
 
 
+print("hello world")
+
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 

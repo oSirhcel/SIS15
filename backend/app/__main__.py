@@ -14,24 +14,23 @@ import uuid
 from classificationMapping import map_class
 import pathlib
 import warnings
+from config import Config
 
 app = Flask(__name__)
 CORS(app)
-MODEL = "best.pth" # Update this as necessary
+
+# Get paths from config
+IMAGES_PATH = Config.IMAGES_PATH
+MODEL_PATH = Config.MODEL_PATH
 
 # Add the parent directory of "model" to the system path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
+#sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 from model.evaluate import get_prediction
 
 # Adding a directory to store processed images
-processed_images_path = os.path.join(pathlib.Path(__file__).parent.resolve(), "images")
+processed_images_path = os.path.join(pathlib.Path(__file__).parent.parent.resolve(), IMAGES_PATH) 
 if not os.path.isdir(processed_images_path):
     os.mkdir(processed_images_path)
-
-# Creating a directory to contain the model
-model_path = os.path.join(pathlib.Path(__file__).parent.resolve(), "model")
-if not os.path.isdir(model_path):
-    os.mkdir(model_path)
 
 @app.route('/scan', methods=['POST'])
 def process_image():
@@ -47,7 +46,7 @@ def process_image():
         
         # Process the image and get classification
         # Needs to be changed in production
-        classification = get_prediction(image_dir, os.path.join(model_path, f"{MODEL}"))
+        classification = get_prediction(image_dir, os.path.join(pathlib.Path(__file__).parent.parent.resolve(), MODEL_PATH))
         print(f"Classification: {classification}")
         
         # Get suggestions from OpenAI based on classification
