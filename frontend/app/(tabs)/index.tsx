@@ -3,7 +3,7 @@ import { View, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text } from '@/components/ui/text';
 
-import { PencilIcon, XIcon, Trash2Icon } from '@/lib/icons';
+import { PencilIcon, XIcon, Trash2Icon, CameraIcon } from '@/lib/icons';
 import { cn, getIconAndColor } from '@/lib/utils';
 import { router } from 'expo-router';
 import { BottomSheetModal } from '@/components/ui/bottom-sheet';
@@ -68,20 +68,6 @@ const ScannedItem = ({
       </View>
       <View className={cn('h-3 w-3 rounded-full', bgColor)} />
     </TouchableOpacity>
-  );
-};
-
-const CallToActionButton = ({ onPress }: { onPress: () => void }) => {
-  return (
-    <Button
-      onPress={onPress}
-      className='mt-4 flex-row items-center justify-center rounded-lg bg-blue-500 p-4'
-      accessibilityRole='button'
-      accessibilityLabel='Scan new item'
-    >
-      {/* <CameraIcon className='mr-2 size-6 text-white' /> */}
-      <Text className={cn('text-lg font-semibold')}>Scan New Item</Text>
-    </Button>
   );
 };
 
@@ -279,9 +265,28 @@ export default function HistoryTab() {
             <Text className='mb-4 text-center text-lg text-slate-600'>
               No items scanned yet. Start by scanning your first item!
             </Text>
-            <CallToActionButton onPress={handleScanNewItem} />
+            <Button
+              onPress={handleScanNewItem}
+              className='mt-4 flex-row items-center justify-center rounded-lg bg-primary p-4'
+              accessibilityRole='button'
+              accessibilityLabel='Scan new item'
+            >
+              <Text className='text-lg font-semibold text-primary-foreground'>
+                Scan New Item
+              </Text>
+            </Button>
           </View>
         )}
+      </View>
+      <View className='absolute bottom-20 left-0 right-0 z-10 flex items-center justify-center'>
+        <Button
+          size='icon'
+          variant='default'
+          className='size-16 rounded-full bg-blue-500'
+          onPress={handleScanNewItem}
+        >
+          <CameraIcon className='text-white' size={32} />
+        </Button>
       </View>
     </SafeAreaView>
   );
