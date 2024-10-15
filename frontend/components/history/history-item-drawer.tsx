@@ -10,16 +10,18 @@ type Props = {
   onRemovePhoto: () => void;
 };
 
-export const HistoryItemDrawer = ({ item, onScanAnotherPhoto, onRemovePhoto }: Props) => {
+export const HistoryItemDrawer = ({
+  item,
+  onScanAnotherPhoto,
+  onRemovePhoto,
+}: Props) => {
   const { icon: Icon, color, bgColor } = getIconAndColor(item.type);
 
   return (
     <BottomSheetView className='flex-1 px-4 pb-6 pt-2'>
       {/* Image */}
       {item.image && (
-        // eslint-disable-next-line @react-native-community/eslint-plugin/no-inline-styles
         <View style={{ width: '100%', height: 300 }}>
-          {/* eslint-disable-next-line @react-native-community/eslint-plugin/no-inline-styles */}
           <TouchableOpacity
             onPress={onScanAnotherPhoto}
             style={{
@@ -43,7 +45,9 @@ export const HistoryItemDrawer = ({ item, onScanAnotherPhoto, onRemovePhoto }: P
       </View>
 
       {/* Bin Suggestion */}
-      <View className={cn('mb-6 flex-row items-center rounded-lg p-4', bgColor)}>
+      <View
+        className={cn('mb-6 flex-row items-center rounded-lg p-4', bgColor)}
+      >
         <Icon size={24} color='white' />
         <Text className='ml-2 font-semibold text-white'>{color}</Text>
       </View>
@@ -54,7 +58,7 @@ export const HistoryItemDrawer = ({ item, onScanAnotherPhoto, onRemovePhoto }: P
           <>
             <Text className='mb-2 font-semibold'>Recycle:</Text>
             <Text className='text-gray-600'>{item.suggestions.recycle}</Text>
-            <Text className='mt-4 mb-2 font-semibold'>Reuse:</Text>
+            <Text className='mb-2 mt-4 font-semibold'>Reuse:</Text>
             <Text className='text-gray-600'>{item.suggestions.reuse}</Text>
           </>
         )}

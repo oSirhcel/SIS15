@@ -212,7 +212,6 @@ export default function Tab() {
           />
         )}
         enablePanDownToClose={false}
-        backgroundStyle={{ backgroundColor: 'hsl(var(--background))' }}
       >
         {!!scannedItem && <ScannedItemDrawer item={scannedItem} />}
         {isPending && <ScannedItemDrawerSkeleton />}
@@ -239,7 +238,7 @@ export default function Tab() {
             flex: 1,
           }}
         >
-          <View className='mb-32 flex-1 flex-row items-end justify-between px-4'>
+          <View className='mb-56 flex-1 flex-row items-end justify-between px-4'>
             <Button
               onPress={pickImageFromLibrary}
               size={'icon'}
@@ -256,7 +255,7 @@ export default function Tab() {
               <CameraIcon className='text-primary-foreground' />
             </Button>
           </View>
-          <View className='absolute bottom-0 left-0 right-0 h-24 bg-background' />
+          <View className='absolute bottom-0 left-0 right-0 h-32 bg-background' />
         </Image>
       ) : (
         <CameraView
@@ -266,7 +265,7 @@ export default function Tab() {
             flex: 1,
           }}
         >
-          <View className='absolute bottom-0 left-0 right-0 h-24 bg-background'>
+          <View className='absolute bottom-0 left-0 right-0 h-32 bg-background'>
             <View className='flex-1 flex-row items-center justify-between px-4'>
               <TouchableOpacity
                 onPress={pickImageFromLibrary}
