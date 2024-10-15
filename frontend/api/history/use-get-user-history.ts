@@ -46,7 +46,7 @@ export const useRemoveScannedItems = () => {
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory));
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['history'] });
+      void queryClient.invalidateQueries({ queryKey: ['history'] });
     },
   });
 };

@@ -36,7 +36,7 @@ export const useScanItem = () => {
       await addScannedItemToHistory(data);
 
       // Invalidate the history query (trigger refetch)
-      queryClient.invalidateQueries({ queryKey: ['history'] });
+      void queryClient.invalidateQueries({ queryKey: ['history'] });
     },
   });
 
