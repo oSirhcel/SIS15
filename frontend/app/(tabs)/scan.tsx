@@ -206,13 +206,13 @@ export default function Tab() {
         backdropComponent={renderBackdrop}
         handleComponent={() => (
           <BottomSheetHandle
-            className='mt-2 bg-green-300'
+            className='mt-2 bg-primary'
             animatedIndex={animatedIndex}
             animatedPosition={animatedPosition}
           />
         )}
         enablePanDownToClose={false}
-        backgroundStyle={{ backgroundColor: '#f3f4f6' }}
+        backgroundStyle={{ backgroundColor: 'hsl(var(--background))' }}
       >
         {!!scannedItem && <ScannedItemDrawer item={scannedItem} />}
         {isPending && <ScannedItemDrawerSkeleton />}
@@ -226,9 +226,9 @@ export default function Tab() {
             closeBottomSheet();
           }}
           size={'icon'}
-          className='rounded-full p-8'
+          className='rounded-full bg-background'
         >
-          <ArrowLeftIcon className='text-primary-foreground' />
+          <ArrowLeftIcon className='text-card-foreground' />
         </Button>
       </View>
 
@@ -243,7 +243,7 @@ export default function Tab() {
             <Button
               onPress={pickImageFromLibrary}
               size={'icon'}
-              className='rounded-full p-8'
+              className='rounded-full bg-primary p-8'
             >
               <ImageIcon className='text-primary-foreground' />
             </Button>
@@ -256,7 +256,7 @@ export default function Tab() {
               <CameraIcon className='text-primary-foreground' />
             </Button>
           </View>
-          <View className='absolute bottom-0 left-0 right-0 h-24 bg-black' />
+          <View className='absolute bottom-0 left-0 right-0 h-24 bg-background' />
         </Image>
       ) : (
         <CameraView
@@ -266,11 +266,11 @@ export default function Tab() {
             flex: 1,
           }}
         >
-          <View className='absolute bottom-0 left-0 right-0 h-24 bg-black'>
+          <View className='absolute bottom-0 left-0 right-0 h-24 bg-background'>
             <View className='flex-1 flex-row items-center justify-between px-4'>
               <TouchableOpacity
                 onPress={pickImageFromLibrary}
-                className='h-16 w-12 overflow-hidden rounded-md border-2 border-white'
+                className='h-16 w-12 overflow-hidden rounded-md border-2 border-primary'
               >
                 {lastPhoto && (
                   <Image
@@ -285,16 +285,16 @@ export default function Tab() {
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={takePicture}
-                className='h-16 w-16 items-center justify-center rounded-full bg-white'
+                className='h-16 w-16 items-center justify-center rounded-full bg-primary'
               >
-                <View className='h-14 w-14 rounded-full bg-gray-200' />
+                <View className='h-14 w-14 rounded-full bg-primary-foreground' />
               </TouchableOpacity>
               <Button
                 onPress={changeFacing}
                 variant='ghost'
                 className='h-16 w-12'
               >
-                <Repeat2Icon className='h-16 w-12 text-white' />
+                <Repeat2Icon className='h-16 w-12 text-primary' />
               </Button>
             </View>
           </View>
