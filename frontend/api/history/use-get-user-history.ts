@@ -12,7 +12,6 @@ export const useGetUserHistory = () => {
       const history: ScannedItem[] = historyString ? JSON.parse(historyString) : [];
       return { items: history };
     },
-    initialData: { items: [] }, // Provide initial data to avoid loading state
   });
   return query;
 };
@@ -23,7 +22,7 @@ export const addScannedItemToHistory = async (item: ScannedItem) => {
     const history: ScannedItem[] = historyString ? JSON.parse(historyString) : [];
 
     // Set the date property (used solely for history item)
-    item.date = new Date()
+    item.date = new Date();
 
     history.push(item);
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(history));
