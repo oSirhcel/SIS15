@@ -15,7 +15,7 @@ export type Suggestions = {
 export type ScannedItem = {
   suggestions: Suggestions;  // Updated to be an object with more fields
   id: string;
-  userId: string;
+  //userId: string;
   image: string | null;
   type: WasteType;
   companies: Company[];  // Array of companies
@@ -34,12 +34,12 @@ export type User = {
 
 // Response format for fetching the scan history of a user.
 export type GetHistoryResponse = {
-  userId: string;
+  //userId: string;
   items: ScannedItem[];  // Array of ScannedItem objects
 };
 
 // Request format for sending an image for scanning.
 export type ScanItemRequest = {
-  userId: string;
+  //userId: string;
   img_base64: string;  // Base64 encoded image string
 };
