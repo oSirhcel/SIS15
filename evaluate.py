@@ -48,7 +48,7 @@ def classify_image(model, classifier, image_tensor, classes):
     # img_emb
     with torch.no_grad():
         image_encoding = model.encode_image(image_tensor.to(device))
-        image_encoding = F.normalize(image_encoding)  # 标准化
+        image_encoding = F.normalize(image_encoding)  
 
     # predict
     with torch.no_grad():
