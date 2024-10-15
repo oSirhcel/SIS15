@@ -1,5 +1,6 @@
 import type { ScanItemRequest, ScannedItem } from '@/types';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
+import { addScannedItemToHistory } from '../history/use-get-user-history';
 
 const url = process.env.EXPO_PUBLIC_API_URL;
 
@@ -30,11 +31,12 @@ export const useScanItem = () => {
       console.log('Scan successful:', result);
       return result;
     },
-    onSuccess: (_, variables) => {
-      // Invalidate the history query for the specific user
-      void queryClient.invalidateQueries({
-        queryKey: ['history', variables.userId],
-      });
+    onSuccess: (data) => {
+      // Add the scanned item to local storage history
+      void addScannedItemToHistory(data);
+
+      // Invalidate the history query
+      void queryClient.invalidateQueries({ queryKey: ['history'] });
     },
   });
 

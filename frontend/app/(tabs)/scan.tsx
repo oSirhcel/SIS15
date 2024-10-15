@@ -127,7 +127,7 @@ export default function Tab() {
       mutate(
         {
           img_base64: photo.base64,
-          userId: '1', // Replace with actual user ID
+          //userId: '1', // Replace with actual user ID
         },
         {
           onSuccess: (data) => {
@@ -172,7 +172,7 @@ export default function Tab() {
     mutate(
       {
         img_base64: result.assets[0].base64,
-        userId: '1', // Replace with actual user ID
+        //userId: '1', // Replace with actual user ID
       },
       {
         onSuccess: (data) => {
