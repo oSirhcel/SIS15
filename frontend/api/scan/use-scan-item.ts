@@ -31,12 +31,12 @@ export const useScanItem = () => {
       console.log('Scan successful:', result);
       return result;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       // Add the scanned item to local storage history
-      void addScannedItemToHistory(data);
+      await addScannedItemToHistory(data);
 
-      // Invalidate the history query
-      void queryClient.invalidateQueries({ queryKey: ['history'] });
+      // Invalidate the history query (trigger refetch)
+      queryClient.invalidateQueries({ queryKey: ['history'] });
     },
   });
 
