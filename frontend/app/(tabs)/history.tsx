@@ -1,9 +1,9 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { View, ScrollView, TouchableOpacity } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text } from '@/components/ui/text';
 
-import { PencilIcon, XIcon } from '@/lib/icons';
+import { PencilIcon, XIcon, Trash2Icon } from '@/lib/icons';
 import { cn, getIconAndColor } from '@/lib/utils';
 import { router } from 'expo-router';
 import {
@@ -12,7 +12,7 @@ import {
 import { useSharedValue } from 'react-native-reanimated';
 import type { ScannedItem } from '@/types';
 
-import { useGetUserHistory } from '@/api/history/use-get-user-history';
+import { useGetUserHistory, useRemoveScannedItems } from '@/api/history/use-get-user-history';
 import { Button } from '@/components/ui/button';
 import { DRAWER_SNAP_POINTS } from '@/lib/constants';
 import {
@@ -86,6 +86,7 @@ const CallToActionButton = ({ onPress }: { onPress: () => void }) => {
 
 export default function HistoryTab() {
   const historyQuery = useGetUserHistory();
+  const { mutate: removeItems } = useRemoveScannedItems();
 
   const historyItems = historyQuery.data?.items ?? [];
 
@@ -132,13 +133,57 @@ export default function HistoryTab() {
     router.push('/scan');
   };
 
-  const handleRemovePhoto = () => {
-    closeBottomSheet();
+  const handleRemovePhotoFromBottomSheet = () => {
+    if (selectedItem) {
+      Alert.alert(
+        'Remove Item',
+        'Are you sure you want to remove this item from your history?',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Remove',
+            style: 'destructive',
+            onPress: () => {
+              removeItems([selectedItem.id]);
+              setSelectedItem(null);
+              closeBottomSheet();
+            },
+          },
+        ],
+      );
+    }
   };
 
   const toggleEditMode = () => {
     setIsEditing(!isEditing);
     setSelectedItems([]); // Clear selections when exiting edit mode
+  };
+
+  const handleDeleteSelectedItems = () => {
+    if (selectedItems.length > 0) {
+      Alert.alert(
+        'Delete Items',
+        `Are you sure you want to delete ${selectedItems.length} item(s) from your history?`,
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: () => {
+              removeItems(selectedItems);
+              setSelectedItems([]);
+              setIsEditing(false);
+            },
+          },
+        ],
+      );
+    }
   };
 
   const renderBackdrop = useCallback(
@@ -189,7 +234,7 @@ export default function HistoryTab() {
           <HistoryItemDrawer 
             item={selectedItem} 
             onScanAnotherPhoto={handleScanAnotherPhoto} 
-            onRemovePhoto={handleRemovePhoto} 
+            onRemovePhoto={handleRemovePhotoFromBottomSheet} 
           />
         )}
       </BottomSheetModal>
@@ -200,13 +245,21 @@ export default function HistoryTab() {
               ? `Selected ${selectedItems.length} items`
               : 'Scan History'}
           </Text>
-          <TouchableOpacity onPress={toggleEditMode}>
-            {isEditing ? (
-              <XIcon size={24} className='text-foreground' />
-            ) : (
-              <PencilIcon size={24} className='text-foreground' />
+          <View className='flex-row'>
+            {(isEditing && selectedItems.length > 0) && (
+              <TouchableOpacity onPress={handleDeleteSelectedItems}>
+                <Trash2Icon size={24} className='text-red-500 mr-4' />
+              </TouchableOpacity>
             )}
-          </TouchableOpacity>
+
+            <TouchableOpacity onPress={toggleEditMode}>
+              {isEditing ? (
+                <XIcon size={24} className='text-foreground mr-4' />
+              ) : (
+                <PencilIcon size={24} className='text-foreground mr-4' />
+              )}
+            </TouchableOpacity>
+          </View>
         </View>
 
         {historyItems.length > 0 ? (
