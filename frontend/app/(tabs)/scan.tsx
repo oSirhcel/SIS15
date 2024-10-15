@@ -265,7 +265,7 @@ export default function Tab() {
             flex: 1,
           }}
         >
-          <View className='absolute bottom-0 left-0 right-0 h-32 bg-background'>
+          <View className='absolute bottom-0 left-0 right-0 h-40 bg-background'>
             <View className='flex-1 flex-row items-center justify-between px-4'>
               <TouchableOpacity
                 onPress={pickImageFromLibrary}
@@ -286,7 +286,9 @@ export default function Tab() {
                 onPress={takePicture}
                 className='h-16 w-16 items-center justify-center rounded-full bg-primary'
               >
-                <View className='h-14 w-14 rounded-full bg-primary-foreground' />
+                <View className='flex h-14 w-14 items-center justify-center rounded-full bg-primary-foreground'>
+                  <View className='size-12 rounded-full bg-primary' />
+                </View>
               </TouchableOpacity>
               <Button
                 onPress={changeFacing}
