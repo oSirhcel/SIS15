@@ -55,17 +55,15 @@ def process_image():
         recycle_suggestion = suggestions.get("recycle_suggestion", "No recycle suggestion available")
         reuse_suggestion = suggestions.get("reuse_suggestion", "No reuse suggestion available")
         
-        # Build the response
+        # Build the response (remove userId and date)
         response_data = {
-            "id": '1',
-            "userId": '1',
+            "id": str(uuid.uuid1()), # Generate a unique ID for the item
             "type": map_class(classification),
             "suggestions": {
                 "recycle": recycle_suggestion,
                 "reuse": reuse_suggestion,
             },
             "companies": format_companies(suggestions),
-            "date": f'{datetime.now()}',
         }
         
         return jsonify(response_data), 200
