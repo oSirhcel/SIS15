@@ -63,7 +63,7 @@ const ScannedItem = ({
         </Text>
         {/* <Text className='text-sm text-gray-600'>{item.type}</Text> */}
         <Text className='mt-1 text-xs text-gray-400'>
-          {format(item.date, 'dd-MM HH:mm')}
+          {format(item.date, 'MMM dd HH:mm aaaaa')}m
         </Text>
       </View>
       <View className={cn('h-3 w-3 rounded-full', bgColor)} />

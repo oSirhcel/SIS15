@@ -227,7 +227,7 @@ export default function Tab() {
           size={'icon'}
           className='rounded-full bg-background'
         >
-          <ArrowLeftIcon className='text-card-foreground' />
+          <ArrowLeftIcon size={24} className='text-card-foreground' />
         </Button>
       </View>
 
