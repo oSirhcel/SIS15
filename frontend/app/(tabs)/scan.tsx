@@ -1,7 +1,8 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { type CameraType, CameraView, useCameraPermissions } from 'expo-camera';
+import * as Location from 'expo-location';
 import { Image } from 'expo-image';
 import { CameraIcon, ImageIcon, Repeat2Icon, ArrowLeftIcon } from '@/lib/icons';
 import {
@@ -32,6 +33,8 @@ import {
 export default function Tab() {
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [mediaPermission, requestMediaPermission] = useMediaPermissions();
+  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [locationPermission, setLocationPermission] = useState<boolean>(false);
   const [currentPhoto, setCurrentPhoto] = useState<string | null>(null);
   const [facing, setFacing] = useState<CameraType>('back');
   const [lastPhoto, setLastPhoto] = useState<string | null>(null);
@@ -64,6 +67,7 @@ export default function Tab() {
 
   const [scannedItem, setScannedItem] = useState<ScannedItem>();
 
+  // Getting permission from the user to access camera.
   React.useEffect(() => {
     const fetchLastPhoto = async () => {
       if (mediaPermission?.granted) {
@@ -78,6 +82,26 @@ export default function Tab() {
     };
     void fetchLastPhoto();
   }, [mediaPermission]);
+
+  /* 
+   * Getting permission from the user to access location data. Ideally the
+   * application should still work if they refuse, but we wouldn't be able 
+   * to show them where they could recycle their batteries for example.
+   */
+  useEffect(() => {
+    getLocationPermission();
+  }, []);
+
+  const getLocationPermission = async () => {
+    if (!locationPermission) {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        return;
+      }
+    }
+
+    setLocationPermission(true);
+  }
 
   if (!cameraPermission || !mediaPermission) {
     return (
