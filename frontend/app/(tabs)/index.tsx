@@ -4,39 +4,47 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Wallet, Camera, Trash2 } from 'lucide-react-native';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'expo-router';
-
-// Mock data for scanned items
-const scannedItems = [
-  { id: '1', name: 'Plastic Bottle', points: 10, date: '2023-05-01' },
-  { id: '2', name: 'Cardboard Box', points: 15, date: '2023-05-02' },
-  { id: '3', name: 'Aluminum Can', points: 5, date: '2023-05-03' },
-  { id: '4', name: 'Glass Jar', points: 20, date: '2023-05-04' },
-  { id: '5', name: 'Newspaper', points: 5, date: '2023-05-05' },
-];
+import { useGetUserHistory } from '@/api/history/use-get-user-history';
+import { format } from 'date-fns';
 
 export default function HomePage() {
   const router = useRouter();
+  const { data: historyData, isLoading } = useGetUserHistory();
 
-  const userPoints = scannedItems.reduce((sum, item) => sum + item.points, 0);
+  const scannedItems = historyData?.items || [];
 
-  const renderItem = ({
-    item,
-  }: {
-    item: { id: string; name: string; points: number; date: string };
-  }) => (
+  //const userPoints = scannedItems.reduce((sum, item) => sum + item.points, 0);
+  const userPoints = scannedItems.reduce((sum, item) => sum + 0, 0);
+
+  const renderItem = ({ item }: { item: any }) => (
     <View className='flex-row items-center justify-between border-b border-gray-200 py-3'>
       <View className='flex-row items-center'>
         <Trash2 size={24} color='#4CAF50' />
         <View className='ml-3'>
           <Text className='text-base font-semibold text-gray-800'>
-            {item.name}
+            {item.type}
           </Text>
-          <Text className='text-sm text-gray-500'>{item.date}</Text>
+          <Text className='text-sm text-gray-500'>
+            {format(item.date, 'MMM dd HH:mm aaaaa')}m
+          </Text>
         </View>
       </View>
-      <Text className='text-lg font-bold text-green-600'>+{item.points}</Text>
+      {/* You might want to display something else here, as points are not currently stored */}
+      <Text className='text-lg font-bold text-green-600'>
+        +{item.points || 0}
+      </Text>
     </View>
   );
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={{ flex: 1 }}>
+        <View className='flex-1 items-center justify-center px-4 py-6'>
+          <Text>Loading recent scans...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -90,12 +98,18 @@ export default function HomePage() {
             </Button>
           </View>
 
-          <FlatList
-            data={scannedItems}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id}
-            scrollEnabled={false}
-          />
+          {scannedItems.length > 0 ? (
+            <FlatList
+              data={scannedItems}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id}
+              scrollEnabled={false}
+            />
+          ) : (
+            <Text className='text-center text-gray-500'>
+              No scanned items yet. Start by scanning your first item!
+            </Text>
+          )}
         </View>
       </View>
     </SafeAreaView>
