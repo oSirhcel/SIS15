@@ -90,6 +90,7 @@ export default function Tab() {
    */
   useEffect(() => {
     getLocationPermission();
+    getLocation();
   }, []);
 
   const getLocationPermission = async () => {
@@ -97,10 +98,17 @@ export default function Tab() {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         return;
+      } else {
+        setLocationPermission(true);
       }
     }
+  }
 
-    setLocationPermission(true);
+  const getLocation = async () => {
+    if (locationPermission) {
+      let location = await Location.getCurrentPositionAsync();
+      setLocation(location);
+    }
   }
 
   if (!cameraPermission || !mediaPermission) {
