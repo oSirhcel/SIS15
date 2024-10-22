@@ -29,7 +29,7 @@ import {
   type BottomSheetBackdropProps,
 } from '@gorhom/bottom-sheet';
 
-export default function Tab() {
+export default function ScanTab() {
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [mediaPermission, requestMediaPermission] = useMediaPermissions();
   const [currentPhoto, setCurrentPhoto] = useState<string | null>(null);
@@ -198,7 +198,7 @@ export default function Tab() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: 'black' }}>
       <BottomSheetModal
         ref={bottomSheetModalRef}
         index={0}
