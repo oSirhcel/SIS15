@@ -90,7 +90,6 @@ export default function Tab() {
    */
   useEffect(() => {
     getLocationPermission();
-    getLocation();
   }, []);
 
   const getLocationPermission = async () => {
@@ -105,10 +104,8 @@ export default function Tab() {
   }
 
   const getLocation = async () => {
-    if (locationPermission) {
-      let location = await Location.getCurrentPositionAsync();
-      setLocation(location);
-    }
+    let location = await Location.getCurrentPositionAsync();
+    setLocation(location);
   }
 
   if (!cameraPermission || !mediaPermission) {
@@ -154,12 +151,17 @@ export default function Tab() {
         return;
       }
 
+      if (locationPermission) {
+        getLocation();
+      }
+
       setCurrentPhoto(photo.uri);
 
       mutate(
         {
           img_base64: photo.base64,
-          //userId: '1', // Replace with actual user ID
+          latitude: location?.coords.latitude,
+          longitude: location?.coords.longitude
         },
         {
           onSuccess: (data) => {
@@ -204,7 +206,6 @@ export default function Tab() {
     mutate(
       {
         img_base64: result.assets[0].base64,
-        //userId: '1', // Replace with actual user ID
       },
       {
         onSuccess: (data) => {
