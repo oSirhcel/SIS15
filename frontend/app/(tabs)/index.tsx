@@ -1,11 +1,12 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Wallet, Camera, Trash2 } from 'lucide-react-native';
+import { Wallet, Camera } from 'lucide-react-native';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'expo-router';
 import { useGetUserHistory } from '@/api/history/use-get-user-history';
 import { format } from 'date-fns';
+import { getIconAndColor } from '@/lib/utils';
 
 export default function HomePage() {
   const router = useRouter();
@@ -16,25 +17,29 @@ export default function HomePage() {
   //const userPoints = scannedItems.reduce((sum, item) => sum + item.points, 0);
   const userPoints = scannedItems.reduce((sum, item) => sum + 0, 0);
 
-  const renderItem = ({ item }: { item: any }) => (
-    <View className='flex-row items-center justify-between border-b border-gray-200 py-3'>
-      <View className='flex-row items-center'>
-        <Trash2 size={24} color='#4CAF50' />
-        <View className='ml-3'>
-          <Text className='text-base font-semibold text-gray-800'>
-            {item.type}
-          </Text>
-          <Text className='text-sm text-gray-500'>
-            {format(item.date, 'MMM dd HH:mm aaaaa')}m
-          </Text>
+  const renderItem = ({ item }: { item: any }) => {
+    const { icon: Icon } = getIconAndColor(item.type);
+
+    return (
+      <View className='flex-row items-center justify-between border-b border-gray-200 py-3'>
+        <View className='flex-row items-center'>
+          <Icon size={24} color='#4CAF50' />
+          <View className='ml-3'>
+            <Text className='text-base font-semibold text-gray-800'>
+              {item.type}
+            </Text>
+            <Text className='text-sm text-gray-500'>
+              {format(item.date, 'MMM dd HH:mm aaaaa')}m
+            </Text>
+          </View>
         </View>
+
+        <Text className='text-lg font-bold text-green-600'>
+          +{item.points || 0}
+        </Text>
       </View>
-      {/* You might want to display something else here, as points are not currently stored */}
-      <Text className='text-lg font-bold text-green-600'>
-        +{item.points || 0}
-      </Text>
-    </View>
-  );
+    );
+  };
 
   if (isLoading) {
     return (
