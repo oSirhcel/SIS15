@@ -36,6 +36,8 @@ if not os.path.isdir(processed_images_path):
 def process_image():
     data = request.json
     base64_string = data.get('img_base64')
+    latitude = data.get('latitude')
+    longitude = data.get('longitude')
 
     if not base64_string:
         return jsonify({'error': 'No image data provided'}), 400
