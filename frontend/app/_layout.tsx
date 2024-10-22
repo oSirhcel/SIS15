@@ -27,7 +27,7 @@ export default function RootLayout() {
       <GestureHandlerRootView style={{ flex: 1 }}>
         <ThemeProvider value={LIGHT_THEME}>
           <BottomSheetModalProvider>
-            <StatusBar style={'light'} />
+            <StatusBar style={'dark'} />
             <Stack>
               <Stack.Screen name={'(tabs)'} options={{ headerShown: false }} />
             </Stack>
