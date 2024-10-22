@@ -3,9 +3,18 @@ import { HomeIcon, CameraIcon, Clock4Icon } from '@/lib/icons';
 
 export default function TabLayout() {
   return (
-    <Tabs screenOptions={{}}>
+    <Tabs>
       <Tabs.Screen
         name='index'
+        options={{
+          headerShown: false,
+          title: 'Home',
+          tabBarIcon: ({ color }) => <HomeIcon size={28} color={color} />,
+          tabBarStyle: { display: 'none' },
+        }}
+      />
+      <Tabs.Screen
+        name='history'
         options={{
           headerShown: false,
           title: 'History',
@@ -20,6 +29,7 @@ export default function TabLayout() {
           title: 'Scan',
           tabBarIcon: ({ color }) => <CameraIcon size={28} color={color} />,
           tabBarStyle: { display: 'none' },
+          href: null,
         }}
       />
     </Tabs>
