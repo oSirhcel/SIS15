@@ -1,7 +1,8 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { type CameraType, CameraView, useCameraPermissions } from 'expo-camera';
+import * as Location from 'expo-location';
 import { Image } from 'expo-image';
 import { CameraIcon, ImageIcon, Repeat2Icon, ArrowLeftIcon } from '@/lib/icons';
 import {
@@ -32,6 +33,8 @@ import {
 export default function ScanTab() {
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [mediaPermission, requestMediaPermission] = useMediaPermissions();
+  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [locationPermission, setLocationPermission] = useState<boolean>(false);
   const [currentPhoto, setCurrentPhoto] = useState<string | null>(null);
   const [facing, setFacing] = useState<CameraType>('back');
   const [lastPhoto, setLastPhoto] = useState<string | null>(null);
@@ -64,6 +67,7 @@ export default function ScanTab() {
 
   const [scannedItem, setScannedItem] = useState<ScannedItem>();
 
+  // Getting permission from the user to access camera.
   React.useEffect(() => {
     const fetchLastPhoto = async () => {
       if (mediaPermission?.granted) {
@@ -78,6 +82,31 @@ export default function ScanTab() {
     };
     void fetchLastPhoto();
   }, [mediaPermission]);
+
+  /* 
+   * Getting permission from the user to access location data. Ideally the
+   * application should still work if they refuse, but we wouldn't be able 
+   * to show them where they could recycle their batteries for example.
+   */
+  useEffect(() => {
+    getLocationPermission();
+  }, []);
+
+  const getLocationPermission = async () => {
+    if (!locationPermission) {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        return;
+      } else {
+        setLocationPermission(true);
+      }
+    }
+  }
+
+  const getLocation = async () => {
+    let location = await Location.getCurrentPositionAsync();
+    setLocation(location);
+  }
 
   if (!cameraPermission || !mediaPermission) {
     return (
@@ -122,12 +151,17 @@ export default function ScanTab() {
         return;
       }
 
+      if (locationPermission) {
+        getLocation();
+      }
+
       setCurrentPhoto(photo.uri);
 
       mutate(
         {
           img_base64: photo.base64,
-          //userId: '1', // Replace with actual user ID
+          latitude: location?.coords.latitude,
+          longitude: location?.coords.longitude
         },
         {
           onSuccess: (data) => {
@@ -172,7 +206,6 @@ export default function ScanTab() {
     mutate(
       {
         img_base64: result.assets[0].base64,
-        //userId: '1', // Replace with actual user ID
       },
       {
         onSuccess: (data) => {
