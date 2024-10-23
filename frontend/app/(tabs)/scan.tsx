@@ -1,4 +1,10 @@
-import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react';
+import React, {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  useEffect,
+} from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { type CameraType, CameraView, useCameraPermissions } from 'expo-camera';
@@ -33,7 +39,9 @@ import {
 export default function ScanTab() {
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [mediaPermission, requestMediaPermission] = useMediaPermissions();
-  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [location, setLocation] = useState<Location.LocationObject | null>(
+    null,
+  );
   const [locationPermission, setLocationPermission] = useState<boolean>(false);
   const [currentPhoto, setCurrentPhoto] = useState<string | null>(null);
   const [facing, setFacing] = useState<CameraType>('back');
@@ -83,9 +91,9 @@ export default function ScanTab() {
     void fetchLastPhoto();
   }, [mediaPermission]);
 
-  /* 
+  /*
    * Getting permission from the user to access location data. Ideally the
-   * application should still work if they refuse, but we wouldn't be able 
+   * application should still work if they refuse, but we wouldn't be able
    * to show them where they could recycle their batteries for example.
    */
   useEffect(() => {
@@ -101,12 +109,12 @@ export default function ScanTab() {
         setLocationPermission(true);
       }
     }
-  }
+  };
 
   const getLocation = async () => {
     let location = await Location.getCurrentPositionAsync();
     setLocation(location);
-  }
+  };
 
   if (!cameraPermission || !mediaPermission) {
     return (
@@ -161,7 +169,7 @@ export default function ScanTab() {
         {
           img_base64: photo.base64,
           latitude: location?.coords.latitude,
-          longitude: location?.coords.longitude
+          longitude: location?.coords.longitude,
         },
         {
           onSuccess: (data) => {
@@ -298,7 +306,7 @@ export default function ScanTab() {
             flex: 1,
           }}
         >
-          <View className='absolute bottom-0 left-0 right-0 h-40 bg-background'>
+          <View className='absolute bottom-0 left-0 right-0 h-40 bg-black'>
             <View className='flex-1 flex-row items-center justify-between px-4'>
               <TouchableOpacity
                 onPress={pickImageFromLibrary}
@@ -317,19 +325,18 @@ export default function ScanTab() {
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={takePicture}
-                className='h-16 w-16 items-center justify-center rounded-full bg-primary'
+                className='h-16 w-16 items-center justify-center rounded-full bg-white'
               >
-                <View className='flex h-14 w-14 items-center justify-center rounded-full bg-primary-foreground'>
-                  <View className='size-12 rounded-full bg-primary' />
+                <View className='flex h-14 w-14 items-center justify-center rounded-full bg-black'>
+                  <View className='size-12 rounded-full bg-white' />
                 </View>
               </TouchableOpacity>
-              <Button
+              <TouchableOpacity
                 onPress={changeFacing}
-                variant='ghost'
-                className='h-16 w-12'
+                className='flex h-16 w-12 items-center justify-center'
               >
-                <Repeat2Icon className='h-16 w-12 text-primary' />
-              </Button>
+                <Repeat2Icon className='h-16 w-12 text-white' />
+              </TouchableOpacity>
             </View>
           </View>
         </CameraView>

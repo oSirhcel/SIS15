@@ -3,7 +3,7 @@ import { View, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text } from '@/components/ui/text';
 
-import { PencilIcon, XIcon, Trash2Icon, CameraIcon } from '@/lib/icons';
+import { PencilIcon, XIcon, Trash2Icon, ArrowLeftIcon } from '@/lib/icons';
 import { cn, getIconAndColor } from '@/lib/utils';
 import { router } from 'expo-router';
 import { BottomSheetModal } from '@/components/ui/bottom-sheet';
@@ -225,7 +225,10 @@ export default function HistoryTab() {
       </BottomSheetModal>
       <View className='flex-1 px-4 py-2'>
         <View className='mb-4 flex-row items-center justify-between'>
-          <Text className={cn('text-2xl font-bold')}>
+          <TouchableOpacity onPress={() => router.push('/(tabs)/')}>
+            <ArrowLeftIcon size={24} className='mr-4 text-slate-500' />
+          </TouchableOpacity>
+          <Text className={cn('text-2xl font-bold text-sky-600')}>
             {isEditing
               ? `Selected ${selectedItems.length} items`
               : 'Scan History'}
@@ -241,7 +244,7 @@ export default function HistoryTab() {
               {isEditing ? (
                 <XIcon size={24} className='mr-4 text-foreground' />
               ) : (
-                <PencilIcon size={24} className='mr-4 text-foreground' />
+                <PencilIcon size={24} className='mr-4 text-slate-500' />
               )}
             </TouchableOpacity>
           </View>
@@ -265,7 +268,7 @@ export default function HistoryTab() {
             </Text>
             <Button
               onPress={handleScanNewItem}
-              className='mt-4 flex-row items-center justify-center rounded-lg bg-primary p-4'
+              className='mt-4 flex-row items-center justify-center rounded-lg bg-sky-600 p-4'
               accessibilityRole='button'
               accessibilityLabel='Scan new item'
             >
