@@ -42,4 +42,6 @@ export type GetHistoryResponse = {
 export type ScanItemRequest = {
   //userId: string;
   img_base64: string;  // Base64 encoded image string
+  latitude?: number;
+  longitude?: number;
 };
