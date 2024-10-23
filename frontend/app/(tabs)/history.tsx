@@ -39,9 +39,7 @@ const ScannedItem = ({
       onPress={onPress}
       className={cn(
         'mb-2 flex-row items-center rounded-lg p-4',
-        isSelected
-          ? 'bg-gray-800 dark:bg-blue-100'
-          : 'bg-blue-100 dark:bg-gray-800',
+        isSelected ? 'bg-blue-100' : 'bg-slate-100',
       )}
     >
       <View
@@ -55,8 +53,8 @@ const ScannedItem = ({
       <View className='flex-1'>
         <Text
           className={cn(
-            'text-lg font-semibold',
-            isSelected && 'text-white dark:text-black',
+            'text-lg font-semibold text-black',
+            isSelected && 'text-black',
           )}
         >
           {item.type}
@@ -242,7 +240,7 @@ export default function HistoryTab() {
 
             <TouchableOpacity onPress={toggleEditMode}>
               {isEditing ? (
-                <XIcon size={24} className='mr-4 text-foreground' />
+                <XIcon size={24} className='text- mr-4' />
               ) : (
                 <PencilIcon size={24} className='mr-4 text-slate-500' />
               )}
