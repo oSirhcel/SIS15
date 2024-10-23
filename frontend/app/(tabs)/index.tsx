@@ -1,42 +1,73 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { WalletIcon, CameraIcon, Trash2Icon } from '@/lib/icons';
+import { WalletIcon, CameraIcon } from '@/lib/icons';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'expo-router';
-
-// Mock data for scanned items
-const scannedItems = [
-  { id: '1', name: 'Plastic Bottle', points: 10, date: '2023-05-01' },
-  { id: '2', name: 'Cardboard Box', points: 15, date: '2023-05-02' },
-  { id: '3', name: 'Aluminum Can', points: 5, date: '2023-05-03' },
-  { id: '4', name: 'Glass Jar', points: 20, date: '2023-05-04' },
-  { id: '5', name: 'Newspaper', points: 5, date: '2023-05-05' },
-];
+import { useGetUserHistory } from '@/api/history/use-get-user-history';
+import { format } from 'date-fns';
+import { getIconAndColor } from '@/lib/utils';
+import type { WasteType } from '@/types';
 
 export default function HomePage() {
   const router = useRouter();
+  const { data: historyData, isLoading } = useGetUserHistory();
 
-  const userPoints = scannedItems.reduce((sum, item) => sum + item.points, 0);
+  const scannedItems = historyData?.items ?? [];
+
+  const scannedItemsWithPoints = scannedItems.map((item) => ({
+    ...item,
+    points: 10,
+  }));
+
+  //const userPoints = scannedItems.reduce((sum, item) => sum + item.points, 0);
+  const userPoints = scannedItemsWithPoints.reduce(
+    (sum, item) => sum + item.points,
+    0,
+  );
 
   const renderItem = ({
     item,
   }: {
-    item: { id: string; name: string; points: number; date: string };
-  }) => (
-    <View className='flex-row items-center justify-between border-b border-gray-200 py-3'>
-      <View className='flex-row items-center'>
-        <Trash2Icon size={24} className='text-sky-600' />
-        <View className='ml-3'>
-          <Text className='text-base font-semibold text-gray-800'>
-            {item.name}
-          </Text>
-          <Text className='text-sm text-gray-500'>{item.date}</Text>
+    item: {
+      id: string;
+      type: WasteType;
+      date: Date;
+      points: number;
+    };
+  }) => {
+    const { icon: Icon } = getIconAndColor(item.type);
+
+    return (
+      <View className='flex-row items-center justify-between border-b border-gray-200 py-3'>
+        <View className='flex-row items-center'>
+          <Icon size={24} className='text-sky-600' />
+          <View className='ml-3'>
+            <Text className='text-base font-semibold text-gray-800'>
+              {item.type}
+            </Text>
+            <Text className='text-sm text-gray-500'>
+              {format(item.date, 'MMM dd HH:mm aaaaa')}m
+            </Text>
+          </View>
         </View>
+
+        <Text className='text-lg font-bold text-sky-600'>
+          +{item.points || 0}
+        </Text>
       </View>
-      <Text className='text-lg font-bold text-sky-600'>+{item.points}</Text>
-    </View>
-  );
+    );
+  };
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={{ flex: 1 }}>
+        <View className='flex-1 items-center justify-center px-4 py-6'>
+          <Text>Loading recent scans...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -79,23 +110,29 @@ export default function HomePage() {
 
         <View className='rounded-xl bg-white p-4 shadow-sm'>
           <View className='flex flex-row items-center justify-between'>
-            <Text className='mb-2 text-xl font-semibold text-slate-800'>
+            <Text className='mb-2 text-xl font-semibold text-gray-800'>
               Recent Scans
             </Text>
             <Button
               variant='link'
               onPress={() => router.push('/(tabs)/history')}
             >
-              <Text className='text-slate-500'>View More</Text>
+              <Text>View More</Text>
             </Button>
           </View>
 
-          <FlatList
-            data={scannedItems}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id}
-            scrollEnabled={false}
-          />
+          {scannedItems.length > 0 ? (
+            <FlatList
+              data={scannedItemsWithPoints}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id}
+              scrollEnabled={false}
+            />
+          ) : (
+            <Text className='text-center text-gray-500'>
+              No scanned items yet. Start by scanning your first item!
+            </Text>
+          )}
         </View>
       </View>
     </SafeAreaView>

@@ -20,7 +20,14 @@
 ### Frontend
 ```bash
 cd frontend
+
+# Install bun dependencies
 bun install
+
+# Copy .env.example to .env and make relevant changes
+# Need to change URL (see: Setup environment variables)
+cp .env.example .env
+nano .env
 ```
 
 ### Backend
@@ -31,14 +38,19 @@ cd backend
 conda env create -f environment.yaml
 conda activate garbage
 
-# Run the development server
-python app
+# Download the classification model
+wget "https://github.com/HZYSDS/classification_part/raw/refs/heads/main/best.pth" -P ./app/model/
+
+# Copy .env.example to .env and make relevant changes
+# Need to add OpenAI key (see: OpenAI access key)
+cp .env.example .env
+nano .env
 ```
-**OpenAI access key**
+
+### OpenAI access key
 
 - Refer to our project discord text channel: `apis-datasets-sdk` find the pinned message for the secret key value
-- Directory: `backend/openAIAPI.py`; Variable: `client = OpenAI(api_key="dummy key")` (line 3)
-- Replace `dummy key` with the secret key found in discord
+- Replace `OPENAI_KEY` in `.env` with the secret key found in discord
 
 ### Setup environment variables
 
