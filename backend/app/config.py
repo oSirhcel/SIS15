@@ -8,3 +8,4 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     IMAGES_PATH = os.getenv('IMAGES_PATH')
     MODEL_PATH = os.getenv('MODEL_PATH')
+    GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')

@@ -11,3 +11,5 @@ dependencies:
   - python-dotenv
   - pytorch
   - conda-forge::open-clip-torch
+  - httpx
+  - requests
