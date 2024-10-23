@@ -103,10 +103,8 @@ export default function ScanTab() {
   const getLocationPermission = async () => {
     if (!locationPermission) {
       let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        return;
-      } else {
-        setLocationPermission(true);
+      if (status === 'granted') {
+        setLocationPermission(true)
       }
     }
   };
