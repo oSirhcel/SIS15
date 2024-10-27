@@ -240,7 +240,7 @@ export default function HistoryTab() {
 
             <TouchableOpacity onPress={toggleEditMode}>
               {isEditing ? (
-                <XIcon size={24} className='text- mr-4' />
+                <XIcon size={24} className='mr-4 text-slate-500' />
               ) : (
                 <PencilIcon size={24} className='mr-4 text-slate-500' />
               )}
