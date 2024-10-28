@@ -49,6 +49,24 @@ def get_image(image_id):
         print(f"Error retrieving image: {str(e)}")
         return jsonify({'error': f'Error retrieving image: {str(e)}'}), 500
 
+@app.route('/image/icon/<image_id>', methods=['GET'])
+def get_image_icon(image_id):
+    """Retrieves a processed image icon by its ID."""
+    try:
+        icon_path = os.path.join(processed_images_path, f"{image_id}_icon.jpg")
+        if not os.path.exists(icon_path):
+            return jsonify({'error': 'Image icon not found'}), 404
+
+        with open(icon_path, "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+
+        return encoded_string, 200
+
+    except Exception as e:
+        print(f"Error retrieving image icon: {str(e)}")
+        return jsonify({'error': f'Error retrieving image icon: {str(e)}'}), 500
+
+
 @app.route('/scan', methods=['POST'])
 def process_image():
     data = request.json
@@ -64,6 +82,9 @@ def process_image():
         image_uuid = str(uuid.uuid1())
         image_dir = convert_base64_jpg(base64_string, image_uuid)
         
+        # Create and save the icon image
+        create_and_save_icon(image_dir, image_uuid)
+
         # Process the image and get classification
         # Needs to be changed in production
         classification = get_prediction(image_dir, os.path.join(pathlib.Path(__file__).parent.parent.resolve(), MODEL_PATH))
@@ -127,6 +148,16 @@ def convert_base64_jpg(base64_string, uuid):
         file.write(image_data)
 
     return temp_img_dir  # Return the file path
+
+def create_and_save_icon(image_path, image_uuid):
+    """Creates a 128x128 icon from the given image and saves it."""
+    try:
+        img = Image.open(image_path)
+        img.thumbnail((180, 180))  # Resize to 128x128 while maintaining aspect ratio
+        icon_path = os.path.join(processed_images_path, f"{image_uuid}_icon.jpg")
+        img.save(icon_path)
+    except Exception as e:
+        print(f"Error creating icon: {str(e)}")
 
 
 if __name__ == '__main__':
