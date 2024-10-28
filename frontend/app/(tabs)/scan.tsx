@@ -41,6 +41,7 @@ import {
   type BottomSheetBackdropProps,
 } from '@gorhom/bottom-sheet';
 import { useRemoveScannedItems } from '@/api/history/use-get-user-history';
+import * as ImageManipulator from 'expo-image-manipulator';
 
 export default function ScanTab() {
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
@@ -143,7 +144,7 @@ export default function ScanTab() {
   const takePicture = async () => {
     if (cameraRef.current) {
       const photo = await cameraRef.current.takePictureAsync({
-        base64: true, // Capture the image as a base64 string
+        base64: false, // Don't capture as base64 yet
       });
       if (!photo) {
         console.log('No photo taken');
@@ -153,12 +154,19 @@ export default function ScanTab() {
         await requestMediaPermission();
       }
 
+      // Resize the image
+      const resizedPhoto = await ImageManipulator.manipulateAsync(
+        photo.uri,
+        [{ resize: { width: 540 } }], 
+        { compress: 0.5, format: ImageManipulator.SaveFormat.JPEG, base64: true }, // Compress and convert to base64
+      );
+
       // Open the modal first to show loading state
       handleOpenModal();
 
-      // Send the base64 image data to the backend
-      if (!photo.base64) {
-        console.error('Error: Image data is undefined');
+      // Send the resized base64 image data to the backend
+      if (!resizedPhoto.base64) {
+        console.error('Error: Resized image data is undefined');
         return;
       }
 
@@ -182,7 +190,7 @@ export default function ScanTab() {
 
       mutate(
         {
-          img_base64: photo.base64,
+          img_base64: resizedPhoto.base64,
           latitude: latitude,
           longitude: longitude,
         },
@@ -208,18 +216,25 @@ export default function ScanTab() {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: false,
       quality: 1,
-      base64: true,
+      base64: false, // Don't capture as base64 yet
     });
 
     if (result.canceled || result.assets.length === 0) {
       return;
     }
 
+    // Resize the image
+    const resizedPhoto = await ImageManipulator.manipulateAsync(
+      result.assets[0].uri,
+      [{ resize: { width: 540 } }],
+      { compress: 0.5, format: ImageManipulator.SaveFormat.JPEG, base64: true }, // Compress and convert to base64
+    );
+
     setCurrentPhoto(result.assets[0].uri);
     setScannedItem(undefined);
 
-    if (!result.assets[0].base64) {
-      console.error('Error: Image data is undefined');
+    if (!resizedPhoto.base64) {
+      console.error('Error: Resized image data is undefined');
       return;
     }
 
@@ -227,7 +242,7 @@ export default function ScanTab() {
 
     mutate(
       {
-        img_base64: result.assets[0].base64,
+        img_base64: resizedPhoto.base64,
       },
       {
         onSuccess: (data) => {
@@ -320,30 +335,30 @@ export default function ScanTab() {
 
       {/* Consistent image picker button position */}
       {!!currentPhoto && (
-      <View style={{ position: 'absolute', bottom: 92, left: 16, zIndex: 10 }}>
-        <Button
-          onPress={pickImageFromLibrary}
-          disabled={isPending}
-          size={'icon'}
-          className='rounded-full bg-background p-8'
-        >
-          <ImageIcon className='text-card-foreground' />
-        </Button>
+        <View style={{ position: 'absolute', bottom: 92, left: 16, zIndex: 10 }}>
+          <Button
+            onPress={pickImageFromLibrary}
+            disabled={isPending}
+            size={'icon'}
+            className='rounded-full bg-background p-8'
+          >
+            <ImageIcon className='text-card-foreground' />
+          </Button>
         </View>
       )}
 
       {/* Consistent scan button position */}
       {!!currentPhoto && (
         <View style={{ position: 'absolute', bottom: 92, right: 16, zIndex: 10 }}>
-        <Button
-          onPress={handleScanAnotherPhoto}
-          disabled={isPending}
-          size={'icon'}
-          className='rounded-full bg-background p-8'
-        >
-          <CameraIcon className='text-card-foreground' />
-        </Button>
-      </View>
+          <Button
+            onPress={handleScanAnotherPhoto}
+            disabled={isPending}
+            size={'icon'}
+            className='rounded-full bg-background p-8'
+          >
+            <CameraIcon className='text-card-foreground' />
+          </Button>
+        </View>
       )}
 
       {currentPhoto ? (
