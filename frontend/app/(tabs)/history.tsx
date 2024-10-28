@@ -87,7 +87,7 @@ export default function HistoryTab() {
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
   // variables
-  const snapPoints = useMemo(() => ['90%'], []); // Only one snap point at 90%
+  const snapPoints = useMemo(() => ['90%', '100%'], []); // Only one snap point at 90%
 
   // callbacks
   const handlePresentModalPress = useCallback(() => {
