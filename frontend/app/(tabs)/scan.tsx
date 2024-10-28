@@ -5,12 +5,17 @@ import React, {
   useState,
   useEffect,
 } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Alert } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { type CameraType, CameraView, useCameraPermissions } from 'expo-camera';
 import * as Location from 'expo-location';
 import { Image } from 'expo-image';
-import { CameraIcon, ImageIcon, Repeat2Icon, ArrowLeftIcon } from '@/lib/icons';
+import {
+  CameraIcon,
+  ImageIcon,
+  Repeat2Icon,
+  ArrowLeftIcon,
+} from '@/lib/icons';
 import {
   usePermissions as useMediaPermissions,
   getAssetsAsync,
@@ -35,6 +40,7 @@ import {
   BottomSheetBackdrop,
   type BottomSheetBackdropProps,
 } from '@gorhom/bottom-sheet';
+import { useRemoveScannedItems } from '@/api/history/use-get-user-history';
 
 export default function ScanTab() {
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
@@ -72,6 +78,7 @@ export default function ScanTab() {
   }, []);
 
   const { mutate, isPending } = useScanItem();
+  const { mutate: removeItems } = useRemoveScannedItems();
 
   const [scannedItem, setScannedItem] = useState<ScannedItem>();
 
@@ -104,7 +111,7 @@ export default function ScanTab() {
     if (!locationPermission) {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status === 'granted') {
-        setLocationPermission(true)
+        setLocationPermission(true);
       }
     }
   };
@@ -148,7 +155,7 @@ export default function ScanTab() {
         await requestMediaPermission();
       }
 
-      //Open the modal first to show loading state
+      // Open the modal first to show loading state
       handleOpenModal();
 
       // Send the base64 image data to the backend
@@ -203,7 +210,6 @@ export default function ScanTab() {
 
     if (!result.assets[0].base64) {
       console.error('Error: Image data is undefined');
-
       return;
     }
 
@@ -236,6 +242,31 @@ export default function ScanTab() {
     router.push('/scan');
   };
 
+  const handleRemovePhotoFromBottomSheet = () => {
+    if (scannedItem) {
+      Alert.alert(
+        'Remove Item',
+        'Are you sure you want to remove this item from your history?',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Remove',
+            style: 'destructive',
+            onPress: () => {
+              removeItems([scannedItem.id]);
+              closeBottomSheet();
+              setScannedItem(undefined);
+              setCurrentPhoto(null);
+            },
+          },
+        ],
+      );
+    }
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: 'black' }}>
       <BottomSheetModal
@@ -252,7 +283,14 @@ export default function ScanTab() {
         )}
         enablePanDownToClose={false}
       >
-        {!!scannedItem && <ScannedItemDrawer item={scannedItem} />}
+        {!!scannedItem && (
+          <ScannedItemDrawer
+            item={scannedItem}
+            onScanAnotherPhoto={handleScanAnotherPhoto}
+            onSelectFromLibrary={pickImageFromLibrary}
+            onRemovePhoto={handleRemovePhotoFromBottomSheet}
+          />
+        )}
         {isPending && <ScannedItemDrawerSkeleton />}
       </BottomSheetModal>
 
@@ -271,12 +309,12 @@ export default function ScanTab() {
       </View>
 
       {currentPhoto ? (
-        <View style={{ flex: 1 }}> 
+        <View style={{ flex: 1 }}>
           <Image
             source={{ uri: currentPhoto }}
             style={{
-              flex: 1, 
-              width: '100%', 
+              flex: 1,
+              width: '100%',
               height: '100%',
               resizeMode: 'cover',
             }}

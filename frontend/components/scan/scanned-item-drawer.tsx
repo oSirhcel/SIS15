@@ -1,14 +1,22 @@
 import { BottomSheetView } from '@/components/ui/bottom-sheet';
-import { View, Text, Linking } from 'react-native';
+import { View, Text, Linking, TouchableOpacity } from 'react-native';
 import { cn, getIconAndColor } from '@/lib/utils';
-import { InfoIcon } from '@/lib/icons';
+import { InfoIcon, CameraIcon, ImageIcon, Trash2Icon } from '@/lib/icons';
 import type { ScannedItem } from '@/types';
 
 type Props = {
   item: ScannedItem;
+  onScanAnotherPhoto: () => void;
+  onSelectFromLibrary: () => void;
+  onRemovePhoto: () => void;
 };
 
-export const ScannedItemDrawer = ({ item }: Props) => {
+export const ScannedItemDrawer = ({
+  item,
+  onScanAnotherPhoto,
+  onSelectFromLibrary,
+  onRemovePhoto,
+}: Props) => {
   const { icon: Icon, color, bgColor } = getIconAndColor(item.type);
 
   return (
@@ -59,6 +67,39 @@ export const ScannedItemDrawer = ({ item }: Props) => {
             </View>
           ),
         )}
+      </View>
+
+      {/* Buttons */}
+      <View className='mt-6 flex-row justify-between'>
+        <TouchableOpacity
+          onPress={onScanAnotherPhoto}
+          className='mb-6 mr-2 flex-1 flex-row items-center justify-center rounded-lg bg-blue-500 p-4'
+        >
+          <CameraIcon size={20} color='white' />
+          <Text className='ml-2 font-semibold text-white'>
+            Scan Another Item
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={onSelectFromLibrary}
+          className='mb-6 ml-2 flex-1 flex-row items-center justify-center rounded-lg bg-green-500 p-4'
+        >
+          <ImageIcon size={20} color='white' />
+          <Text className='ml-2 font-semibold text-white'>
+            Select From Library
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <View className='flex-row'>
+        <TouchableOpacity
+          onPress={onRemovePhoto}
+          className='mb-6 flex-1 flex-row items-center justify-center rounded-lg bg-red-500 p-4'
+        >
+          <Trash2Icon size={20} color='white' />
+          <Text className='ml-2 font-semibold text-white'>Remove Item</Text>
+        </TouchableOpacity>
       </View>
     </BottomSheetView>
   );
