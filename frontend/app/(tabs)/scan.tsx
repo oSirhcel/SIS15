@@ -157,7 +157,7 @@ export default function ScanTab() {
       // Resize the image
       const resizedPhoto = await ImageManipulator.manipulateAsync(
         photo.uri,
-        [{ resize: { width: 540 } }], 
+        [{ resize: { width: 720 } }], 
         { compress: 0.5, format: ImageManipulator.SaveFormat.JPEG, base64: true }, // Compress and convert to base64
       );
 
@@ -226,7 +226,7 @@ export default function ScanTab() {
     // Resize the image
     const resizedPhoto = await ImageManipulator.manipulateAsync(
       result.assets[0].uri,
-      [{ resize: { width: 540 } }],
+      [{ resize: { width: 720 } }],
       { compress: 0.5, format: ImageManipulator.SaveFormat.JPEG, base64: true }, // Compress and convert to base64
     );
 

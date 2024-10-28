@@ -22,7 +22,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import { HistoryItemDrawer } from '@/components/history/history-item-drawer';
 import { format } from 'date-fns';
-import { useGetScannedImage } from '@/api/scan/use-get-scanned-image';
+import { useGetScannedImageIcon } from '@/api/scan/use-get-scanned-image';
 
 const ScannedItem = ({
   item,
@@ -34,7 +34,7 @@ const ScannedItem = ({
   isSelected: boolean;
 }) => {
   const { icon: Icon, bgColor } = getIconAndColor(item.type);
-  const imageQuery = useGetScannedImage(item.id);
+  const imageIconQuery = useGetScannedImageIcon(item.id);
 
   return (
     <TouchableOpacity
@@ -44,13 +44,13 @@ const ScannedItem = ({
         isSelected ? 'bg-blue-100' : 'bg-slate-100',
       )}
     >
-      {imageQuery.isLoading ? (
+      {imageIconQuery.isLoading ? ( 
         <View className='mr-4 h-12 w-12 items-center justify-center rounded-full bg-gray-200 animate-pulse' />
-      ) : imageQuery.isError ? (
+      ) : imageIconQuery.isError ? (
         <View className='mr-4 h-12 w-12 items-center justify-center rounded-full bg-red-200' />
       ) : (
         <Image
-          source={{ uri: `data:image/jpeg;base64,${imageQuery.data}` }}
+          source={{ uri: `data:image/jpeg;base64,${imageIconQuery.data}` }}
           style={{ width: 48, height: 48, borderRadius: 8, marginRight: 12 }}
         />
       )}

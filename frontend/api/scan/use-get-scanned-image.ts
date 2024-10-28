@@ -15,3 +15,17 @@ export const useGetScannedImage = (imageId: string) => {
     },
   });
 };
+
+export const useGetScannedImageIcon = (imageId: string) => {
+  return useQuery({
+    queryKey: ['scannedImageIcon', imageId],
+    queryFn: async () => {
+      const response = await fetch(`${url}/image/icon/${imageId}`);
+      if (!response.ok) {
+        throw new Error(`Error fetching image icon: ${response.status}`);
+      }
+      const imageBase64 = await response.text();
+      return imageBase64;
+    },
+  });
+};

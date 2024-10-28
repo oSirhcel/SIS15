@@ -22,7 +22,7 @@ export const HistoryItemDrawer = ({
   return (
     <BottomSheetView className='flex-1 px-4 pb-6 pt-2'>
       {/* Image */}
-      <View style={{ width: '100%', height: 300 }}>
+      <View style={{ height: 300 }}>
         {imageQuery.isLoading ? (
           <View className='flex-1 items-center justify-center'>
             <Text>Loading image...</Text>
