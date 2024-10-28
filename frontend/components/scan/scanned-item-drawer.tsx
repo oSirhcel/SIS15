@@ -82,20 +82,8 @@ export const ScannedItemDrawer = ({
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={onSelectFromLibrary}
-          className='mb-6 ml-2 flex-1 flex-row items-center justify-center rounded-lg bg-green-500 p-4'
-        >
-          <ImageIcon size={20} color='white' />
-          <Text className='ml-2 font-semibold text-white'>
-            Select From Library
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      <View className='flex-row'>
-        <TouchableOpacity
           onPress={onRemovePhoto}
-          className='mb-6 flex-1 flex-row items-center justify-center rounded-lg bg-red-500 p-4'
+          className='mb-6 ml-2 flex-1 flex-row items-center justify-center rounded-lg bg-red-500 p-4'
         >
           <Trash2Icon size={20} color='white' />
           <Text className='ml-2 font-semibold text-white'>Remove Item</Text>
