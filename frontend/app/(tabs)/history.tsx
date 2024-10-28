@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { View, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Alert, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text } from '@/components/ui/text';
 
@@ -22,6 +22,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import { HistoryItemDrawer } from '@/components/history/history-item-drawer';
 import { format } from 'date-fns';
+import { useGetScannedImage } from '@/api/scan/use-get-scanned-image';
 
 const ScannedItem = ({
   item,
@@ -33,6 +34,7 @@ const ScannedItem = ({
   isSelected: boolean;
 }) => {
   const { icon: Icon, bgColor } = getIconAndColor(item.type);
+  const imageQuery = useGetScannedImage(item.id);
 
   return (
     <TouchableOpacity
@@ -42,14 +44,16 @@ const ScannedItem = ({
         isSelected ? 'bg-blue-100' : 'bg-slate-100',
       )}
     >
-      <View
-        className={cn(
-          'mr-4 h-12 w-12 items-center justify-center rounded-full',
-          bgColor,
-        )}
-      >
-        <Icon size={24} color='white' />
-      </View>
+      {imageQuery.isLoading ? (
+        <View className='mr-4 h-12 w-12 items-center justify-center rounded-full bg-gray-200 animate-pulse' />
+      ) : imageQuery.isError ? (
+        <View className='mr-4 h-12 w-12 items-center justify-center rounded-full bg-red-200' />
+      ) : (
+        <Image
+          source={{ uri: `data:image/jpeg;base64,${imageQuery.data}` }}
+          style={{ width: 48, height: 48, borderRadius: 8, marginRight: 12 }}
+        />
+      )}
       <View className='flex-1'>
         <Text
           className={cn(

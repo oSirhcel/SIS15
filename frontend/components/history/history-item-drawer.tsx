@@ -1,8 +1,9 @@
 import { BottomSheetView } from '@/components/ui/bottom-sheet';
-import { View, Text, Linking, TouchableOpacity } from 'react-native';
+import { View, Text, Linking, TouchableOpacity, Image } from 'react-native';
 import { cn, getIconAndColor } from '@/lib/utils';
 import { InfoIcon, CameraIcon, Trash2Icon } from '@/lib/icons';
 import type { ScannedItem } from '@/types';
+import { useGetScannedImage } from '@/api/scan/use-get-scanned-image';
 
 type Props = {
   item: ScannedItem;
@@ -16,28 +17,28 @@ export const HistoryItemDrawer = ({
   onRemovePhoto,
 }: Props) => {
   const { icon: Icon, color, bgColor } = getIconAndColor(item.type);
+  const imageQuery = useGetScannedImage(item.id);
 
   return (
     <BottomSheetView className='flex-1 px-4 pb-6 pt-2'>
       {/* Image */}
-      {item.image && (
-        <View style={{ width: '100%', height: 300 }}>
-          <TouchableOpacity
-            onPress={onScanAnotherPhoto}
-            style={{
-              position: 'absolute',
-              top: 16,
-              left: 16,
-              zIndex: 10,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              padding: 8,
-              borderRadius: 20,
-            }}
-          >
-            <CameraIcon size={24} color='white' />
-          </TouchableOpacity>
-        </View>
-      )}
+      <View style={{ width: '100%', height: 300 }}>
+        {imageQuery.isLoading ? (
+          <View className='flex-1 items-center justify-center'>
+            <Text>Loading image...</Text>
+          </View>
+        ) : imageQuery.isError ? (
+          <View className='flex-1 items-center justify-center'>
+            <Text>Error loading image</Text>
+          </View>
+        ) : (
+          <Image
+            source={{ uri: `data:image/jpeg;base64,${imageQuery.data}` }}
+            style={{ width: '100%', height: '100%' }}
+            resizeMode='cover'
+          />
+        )}
+      </View>
 
       {/* Item Type */}
       <View className='mb-4 mt-4 flex-row items-center justify-between'>

@@ -16,10 +16,10 @@ export type ScannedItem = {
   suggestions: Suggestions;  // Updated to be an object with more fields
   id: string;
   //userId: string;
-  image: string | null;
   type: WasteType;
   companies: Company[];  // Array of companies
   date: Date;
+  image?: string;
 };
 
 // Enum-like string literals to represent different waste types.
