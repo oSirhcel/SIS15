@@ -170,6 +170,8 @@ export default function ScanTab() {
         return;
       }
 
+      setCurrentPhoto(photo.uri);
+
       // Get location only if permission is granted and location services are enabled
       let latitude = undefined;
       let longitude = undefined;
@@ -185,8 +187,6 @@ export default function ScanTab() {
           // Optionally show an error to user here, but not implemented
         }
       }
-
-      setCurrentPhoto(photo.uri);
 
       mutate(
         {
