@@ -32,6 +32,23 @@ processed_images_path = os.path.join(pathlib.Path(__file__).parent.parent.resolv
 if not os.path.isdir(processed_images_path):
     os.mkdir(processed_images_path)
 
+@app.route('/image/<image_id>', methods=['GET'])
+def get_image(image_id):
+    """Retrieves a processed image by its ID."""
+    try:
+        image_path = os.path.join(processed_images_path, f"{image_id}.jpg")
+        if not os.path.exists(image_path):
+            return jsonify({'error': 'Image not found'}), 404
+
+        with open(image_path, "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+
+        return encoded_string, 200
+
+    except Exception as e:
+        print(f"Error retrieving image: {str(e)}")
+        return jsonify({'error': f'Error retrieving image: {str(e)}'}), 500
+
 @app.route('/scan', methods=['POST'])
 def process_image():
     data = request.json
@@ -44,7 +61,8 @@ def process_image():
     
     try:
         # Convert base64 string to an image file
-        image_dir = convert_base64_jpg(base64_string)
+        image_uuid = str(uuid.uuid1())
+        image_dir = convert_base64_jpg(base64_string, image_uuid)
         
         # Process the image and get classification
         # Needs to be changed in production
@@ -59,7 +77,7 @@ def process_image():
         
         # Build the response (remove userId and date)
         response_data = {
-            "id": str(uuid.uuid1()), # Generate a unique ID for the item
+            "id": image_uuid, # Generate a unique ID for the item
             "type": map_class(classification),
             "suggestions": {
                 "recycle": recycle_suggestion,
@@ -74,7 +92,6 @@ def process_image():
         print(f"Error: {str(e)}")
         return jsonify({'error': f'Error processing image: {str(e)}'}), 500
 
-
 def format_companies(suggestions):
     # Assuming suggestions["companies"] is a list of dictionaries with "name" and "website"
     companies_list = []
@@ -86,7 +103,7 @@ def format_companies(suggestions):
     return companies_list
 
 
-def convert_base64_jpg(base64_string):
+def convert_base64_jpg(base64_string, uuid):
     # Ensure the base64 string doesn't include prefixes
     if "base64," in base64_string:
         base64_string = base64_string.split("base64,")[1]
@@ -98,7 +115,7 @@ def convert_base64_jpg(base64_string):
         raise ValueError(f"Invalid base64 data: {e}")
 
     # Generate a unique image ID
-    image_id = uuid.uuid1()
+    image_id = uuid
 
     # Path where the image will be saved
     # Needs to be changed in production
