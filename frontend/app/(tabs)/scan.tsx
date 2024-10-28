@@ -318,6 +318,34 @@ export default function ScanTab() {
         </Button>
       </View>
 
+      {/* Consistent image picker button position */}
+      {!!currentPhoto && (
+      <View style={{ position: 'absolute', bottom: 92, left: 16, zIndex: 10 }}>
+        <Button
+          onPress={pickImageFromLibrary}
+          disabled={isPending}
+          size={'icon'}
+          className='rounded-full bg-background p-8'
+        >
+          <ImageIcon className='text-card-foreground' />
+        </Button>
+        </View>
+      )}
+
+      {/* Consistent scan button position */}
+      {!!currentPhoto && (
+        <View style={{ position: 'absolute', bottom: 92, right: 16, zIndex: 10 }}>
+        <Button
+          onPress={handleScanAnotherPhoto}
+          disabled={isPending}
+          size={'icon'}
+          className='rounded-full bg-background p-8'
+        >
+          <CameraIcon className='text-card-foreground' />
+        </Button>
+      </View>
+      )}
+
       {currentPhoto ? (
         <View style={{ flex: 1 }}>
           <Image
@@ -329,25 +357,6 @@ export default function ScanTab() {
               height: '100%',
             }}
           />
-          <View className='absolute bottom-0 left-0 right-0 h-32 bg-background'>
-            <View className='flex-1 flex-row items-end justify-between px-4'>
-              <Button
-                onPress={pickImageFromLibrary}
-                size={'icon'}
-                className='rounded-full bg-primary p-8'
-              >
-                <ImageIcon className='text-primary-foreground' />
-              </Button>
-              <Button
-                onPress={handleScanAnotherPhoto}
-                disabled={isPending}
-                size={'icon'}
-                className='rounded-full p-8'
-              >
-                <CameraIcon className='text-primary-foreground' />
-              </Button>
-            </View>
-          </View>
         </View>
       ) : (
         <CameraView
