@@ -45,9 +45,6 @@ import { useRemoveScannedItems } from '@/api/history/use-get-user-history';
 export default function ScanTab() {
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [mediaPermission, requestMediaPermission] = useMediaPermissions();
-  const [location, setLocation] = useState<Location.LocationObject | null>(
-    null,
-  );
   const [locationPermission, setLocationPermission] = useState<boolean>(false);
   const [currentPhoto, setCurrentPhoto] = useState<string | null>(null);
   const [facing, setFacing] = useState<CameraType>('back');
@@ -116,10 +113,11 @@ export default function ScanTab() {
     }
   };
 
-  const getLocation = async () => {
-    let location = await Location.getCurrentPositionAsync();
-    setLocation(location);
-  };
+  // No longer needed since we get location inside takePicture
+  // const getLocation = async () => {
+  //   let location = await Location.getCurrentPositionAsync();
+  //   setLocation(location);
+  // };
 
   if (!cameraPermission || !mediaPermission) {
     return (
@@ -164,8 +162,20 @@ export default function ScanTab() {
         return;
       }
 
+      // Get location only if permission is granted and location services are enabled
+      let latitude = undefined;
+      let longitude = undefined;
       if (locationPermission) {
-        getLocation();
+        try {
+          const locationResult = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Low,
+          });
+          latitude = locationResult.coords.latitude;
+          longitude = locationResult.coords.longitude;
+        } catch (error) {
+          console.warn('Error getting location:', error);
+          // Optionally show an error to user here, but not implemented
+        }
       }
 
       setCurrentPhoto(photo.uri);
@@ -173,8 +183,8 @@ export default function ScanTab() {
       mutate(
         {
           img_base64: photo.base64,
-          latitude: location?.coords.latitude,
-          longitude: location?.coords.longitude,
+          latitude: latitude,
+          longitude: longitude,
         },
         {
           onSuccess: (data) => {
